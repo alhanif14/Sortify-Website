@@ -40,7 +40,7 @@ def navbar(user=None):
 
     return Nav(
         Div(
-            A(Img(src="/static/logo/logo-dark.png", alt="Logo", style="height: 35px;"), href=home_href, cls="navbar-brand"),
+            A(Img(src="/static/logo/logo-dark.png", alt="Logo", style="height: 35px;"), href="/", cls="navbar-brand"),
             Div(*navbar_links, cls="navbar-nav mx-auto"),
             right_section,
             cls="container-fluid"
