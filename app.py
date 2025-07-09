@@ -9,6 +9,7 @@ from routes.know_routes import know_routes
 from routes.profile_routes import profile_routes
 from routes.auth_routes import auth_routes
 from starlette.middleware.sessions import SessionMiddleware
+from database.database import get_current_user
 from starlette.responses import RedirectResponse
 import uvicorn
 from dotenv import load_dotenv
@@ -29,27 +30,13 @@ def main_content(user=None):
     if user and user.email == "sortify01@gmail.com":
         content = dashboard_section()
     else:
-        content = landing_section()
+        content = landing_section(user)
 
     return Div(
         content,
         cls="main h-100 w-100 mb-3",
         id="mainContent"
     )
-
-def get_current_user(request):
-    user_id = request.session.get("user_id")
-    if not user_id:
-        return None
-    
-    from database.database import get_db_session
-    from database.models import User
-    
-    db = get_db_session()
-    try:
-        return db.query(User).filter(User.id == user_id).first()
-    finally:
-        db.close()
 
 @rt("/")
 def landing(request):

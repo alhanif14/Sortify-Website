@@ -163,7 +163,7 @@ def landing_cta():
         cls="py-5"
     )
 
-def landing_section():
+def landing_section(user=None):
     return Div(
         ScrollTop(),
         landing_hero(),
@@ -171,7 +171,7 @@ def landing_section():
         landing_features(),
         landing_process(),
         landing_testimonials(),
-        landing_cta(),
+        landing_cta() if user is None else None,
         ScrollTop(),
         cls="landing-page"
     )

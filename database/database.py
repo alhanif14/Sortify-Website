@@ -20,3 +20,17 @@ def get_db_session():
         return db
     finally:
         db.close()
+
+def get_current_user(request):
+    user_id = request.session.get("user_id")
+    if not user_id:
+        return None
+    
+    from database.database import get_db_session
+    from database.models import User
+    
+    db = get_db_session()
+    try:
+        return db.query(User).filter(User.id == user_id).first()
+    finally:
+        db.close()

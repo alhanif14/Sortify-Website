@@ -1,8 +1,5 @@
 from fasthtml.common import *
 
-# ==============================================================================
-# DATA NAVBAR TERPUSAT
-# ==============================================================================
 NAV_ITEMS = [
     {"text": "Home", "href": "/landing", "icon": "home"},
     {"text": "Knowledge", "href": "/know", "icon": "lightbulb"},
@@ -11,9 +8,6 @@ NAV_ITEMS = [
     {"text": "Account", "href": "/profile", "icon": "person"},
 ]
 
-# ==============================================================================
-# NAVBAR DESKTOP
-# ==============================================================================
 def navbar(user=None):
     home_href = "/dashboard" if user and user.email == "sortify01@gmail.com" else "/landing"
 
@@ -48,9 +42,6 @@ def navbar(user=None):
         cls="navbar navbar-expand-lg sticky-top bg-body-tertiary shadow-sm d-none d-lg-block"
     )
 
-# ==============================================================================
-# NAVBAR MOBILE (STRUKTUR DIPERBAIKI TOTAL)
-# ==============================================================================
 def navbar_mobile(user=None):
     home_href = "/dashboard" if user and user.email == "sortify01@gmail.com" else "/landing"
 
@@ -59,7 +50,6 @@ def navbar_mobile(user=None):
         href = home_href if item["text"] == "Home" else item["href"]
         
         if item["text"] == "Scan":
-            # Tombol Scan dibuat terpisah untuk styling yang benar
             link = A(
                 Span(item["icon"], cls="material-symbols-rounded"),
                 href=href, hx_get=href, hx_target="#mainContent",
@@ -67,7 +57,6 @@ def navbar_mobile(user=None):
             )
             mobile_nav_items.append(Div(link, cls="scan-wrapper"))
         else:
-            # Item navbar biasa
             link = A(
                 Span(item["icon"], cls="material-symbols-rounded"),
                 Span(item["text"], cls="small"),
