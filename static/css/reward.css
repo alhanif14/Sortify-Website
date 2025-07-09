@@ -1,0 +1,29 @@
+.reward-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.reward-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+}
+
+.reward-card-img {
+    height: 180px;
+    object-fit: cover;
+    border-bottom: 1px solid #eee;
+}
+
+.modal-terms-list li {
+    position: relative;
+    padding-left: 25px;
+    font-size: 0.95rem;
+}
+
+.modal-terms-list li::before {
+    content: '✔';
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--bs-success);
+    font-weight: bold;
+}

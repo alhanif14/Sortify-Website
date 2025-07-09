@@ -1,0 +1,24 @@
+body{
+    background-color: rgb(254, 255, 245) !important;
+    font-family: 'Monserrat', sans-serif !important;
+     max-width: 100%;
+    /* overflow-x: hidden; */
+}
+
+::selection {
+    background-color: rgb(163, 219, 107);
+    color: rgb(32, 64, 0);
+  }
+
+.scrolltop-button {
+    background-color: #b3ff3887;
+    width: 35px;
+    height: 35px;
+    font-size: 24px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.scrolltop-button:hover {
+    background-color: #c1ff3ccb;
+}

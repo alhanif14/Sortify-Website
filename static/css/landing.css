@@ -1,0 +1,51 @@
+/* Styling untuk Halaman Landing Baru */
+
+.landing-page .hero-image {
+    max-width: 100%;
+    height: auto;
+    /* Animasi sederhana untuk gambar hero */
+    animation: float-up-down 4s ease-in-out infinite;
+}
+
+@keyframes float-up-down {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+/* Styling untuk ikon di section proses */
+.landing-page .feature {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 4rem;
+    width: 4rem;
+    font-size: 2rem;
+}
+
+/* Memberikan sedikit pemisah antar section */
+.landing-page .py-5 {
+    padding-top: 5rem !important;
+    padding-bottom: 5rem !important;
+}
+
+/* Styling untuk kartu testimoni */
+.landing-page .card {
+    transition: transform 0.2s ease-in-out;
+}
+.landing-page .card:hover {
+    transform: translateY(-5px);
+}
+
+/* Memastikan gambar pada section fitur tidak terlalu besar di mobile */
+@media (max-width: 767.98px) {
+    .landing-page .mb-5 {
+        margin-bottom: 3rem !important;
+    }
+    .landing-page .row > .col-md-7 {
+        margin-top: 2rem;
+    }
+}

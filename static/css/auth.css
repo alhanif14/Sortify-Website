@@ -1,0 +1,209 @@
+
+
+.auth-container {
+    max-width: 400px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    text-align: center;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.logo {
+    width: 7rem;
+    margin-bottom: 1rem;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.subtitle {
+    color: #555;
+    margin-bottom: 1.5rem;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap !important;
+    background: #f1f1f1;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+}
+
+.input-group .material-symbols-rounded {
+    font-size: 22px;
+    margin-right: 0.75rem;
+    color: #777;
+}
+
+.input-group input {
+    border: none;
+    background: transparent;
+    outline: none;
+    flex: 1;
+    font-size: 1rem;
+}
+
+.btn-submit {
+    background-color: #4d7c59;
+    color: white;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 8px;
+    width: 100%;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 0.5rem;
+}
+
+.separator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 1.5rem 0;
+}
+
+.separator hr {
+    flex: 1;
+    height: 2px;
+    background: #939393;
+    border: none;
+}
+
+.separator span {
+    margin: 0 1rem;
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    font-size: 24px;
+    margin-bottom: 1rem;
+}
+
+.icon-social {
+    font-size: 28px;
+    color: #555;
+    cursor: pointer;
+}
+
+.auth-toggle {
+    font-size: 0.9rem;
+    margin-top: 1rem;
+    color: #666;
+}
+
+.auth-toggle .link {
+    color: #4d7c59;
+    font-weight: 500;
+    text-decoration: none;
+    margin-left: 0.25rem;
+}
+
+.auth-toggle .link:hover {
+    text-decoration: underline;
+}
+
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-input {
+  padding-right: 2.5em; /* beri ruang untuk icon */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 0.5em;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #666;
+  user-select: none;
+}
+
+/* ✅ Alert Styles - Tambahkan ke CSS Anda */
+.messages-container {
+    margin-top: 20px;
+    width: 100%;
+}
+
+.alert {
+    padding: 15px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    border: 1px solid;
+    position: relative;
+    /* ✅ Animation untuk menarik perhatian */
+    animation: slideInUp 0.5s ease-out, pulse 2s ease-in-out;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.alert-danger {
+    background-color: #fef2f2;
+    border-color: #fecaca;
+    color: #dc2626;
+    /* ✅ Red glow effect */
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+}
+
+.alert-success {
+    background-color: #f0fdf4;
+    border-color: #bbf7d0;
+    color: #16a34a;
+    /* ✅ Green glow effect */
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
+}
+
+.alert .link {
+    color: inherit;
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+.alert .link:hover {
+    text-decoration: none;
+    opacity: 0.8;
+}
+
+/* ✅ Animations */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.02);
+    }
+}
+
+/* ✅ Tambahan untuk mobile responsiveness */
+@media (max-width: 768px) {
+    .alert {
+        padding: 12px 15px;
+        font-size: 14px;
+    }
+}

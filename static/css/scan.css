@@ -1,0 +1,182 @@
+.scan-page {
+    position: relative;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    background: black;
+}
+
+.camera-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+}
+
+/* Logo di atas video, posisi tengah atas */
+.scan-logo {
+    position: absolute;
+    top: 100px;  /* Jarak dari atas */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 350px;
+    z-index: 2;
+}
+
+/* Garis scan dengan animasi gradient vertikal */
+.scan-overlay {
+    position: absolute;
+    top: 0;  /* Garis mulai dari atas */
+    left: 0;
+    width: 100%;
+    height: 10px;  /* Lebar garis scan */
+    background: linear-gradient(0deg, rgba(0, 255, 0, 0.7), rgba(0, 255, 0, 0.3), rgba(0, 255, 0, 0.7));  /* Gradient lebih intens */
+    animation: gradientAnimation 4s ease-in-out infinite;  /* Durasi animasi lebih lambat */
+    z-index: 1;
+}
+
+/* Animasi gradient bergerak ke atas dan ke bawah */
+@keyframes gradientAnimation {
+    0% {
+        transform: translateY(0); /* Mulai dari atas */
+    }
+    50% {
+        transform: translateY(100vh); /* Bergerak ke bawah sampai ke bawah layar */
+    }
+    100% {
+        transform: translateY(0); /* Kembali ke atas */
+    }
+}
+
+.receipt-page {
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.receipt-box {
+    background: white;
+    padding: 2rem;
+    margin: 2rem;
+    width: 350px;
+    border-radius: 10px;
+    border: 1px dashed #ccc;
+    box-shadow: 0 0 8px rgba(0,0,0,0.05);
+    text-align: center;
+}
+
+.receipt-logo {
+    width: 100px;
+    display: block;
+    margin: 0 auto 0.5rem auto;
+}
+
+.receipt-date {
+    font-size: 0.85rem;
+    color: #888;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.receipt-hello {
+    font-size: 1.3rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+.receipt-msg {
+    font-size: 0.95rem;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.waste-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.waste-index {
+    position: absolute;
+    left: -1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: #444;
+}
+
+.waste-left {
+    display: flex;
+    align-items: center;
+}
+
+.waste-img {
+    width: 32px;
+    height: 32px;
+    margin-right: 0.75rem;
+}
+
+.waste-name {
+    font-size: 1rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.waste-point {
+    font-size: 0.95rem;
+    color: green;
+    font-weight: bold;
+    margin-bottom: 0;
+    margin-left: 8rem;
+}
+
+.receipt-total-row {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-top: 1rem;
+    border-top: 1px dashed #ccc;
+    padding-top: 0.5rem;
+}
+
+.receipt-order {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: #555;
+    text-align: center;
+}
+
+
+/* .scan1-container {
+    min-height: 100vh;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+} */
+
+.scan1-illustration {
+    width: 180px;
+    margin-bottom: 1rem;
+}
+
+.scan1-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.scan1-desc {
+    font-size: 2rem;
+    color: #444;
+    margin-bottom: 0.5rem;
+}
+
+.scan1-warning {
+    font-size: 1.5rem;
+    color: #2d572c;
+    font-weight: bold;
+}

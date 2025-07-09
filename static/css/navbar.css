@@ -1,0 +1,121 @@
+/* --- Navbar Desktop --- */
+.navbar.sticky-top {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px);
+}
+
+.nav-item-desktop {
+    position: relative;
+    transition: color 0.2s ease-in-out;
+    padding-bottom: 8px !important;
+    text-decoration: none;
+    color: #6c757d; /* Warna default abu-abu */
+}
+
+.nav-item-desktop::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: var(--bs-success);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+    border-radius: 2px;
+}
+
+/* EFEK HOVER UNTUK DESKTOP */
+.nav-item-desktop:hover {
+    color: #212529 !important; /* Warna teks lebih gelap saat hover */
+}
+
+.nav-item-desktop.active {
+    color: var(--bs-success) !important;
+    font-weight: 600;
+}
+
+.nav-item-desktop.active::after {
+    transform: scaleX(1);
+}
+
+
+/* --- Navbar Mobile --- */
+.mobile-navbar-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background-color: #fff;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
+    z-index: 1000;
+}
+
+.mobile-navbar-inner {
+    display: flex;
+    justify-content: space-around;
+    align-items: end;
+    height: 100%;
+    padding: 0 10px;
+}
+
+.nav-item-mobile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    height: 100%;
+    color: #6c757d;
+    text-decoration: none;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.nav-item-mobile .small {
+    font-size: 0.7rem;
+    margin-top: 2px;
+}
+
+/* EFEK HOVER UNTUK MOBILE (akan aktif saat ditekan) */
+.nav-item-mobile:hover {
+    color: var(--bs-success);
+}
+
+.nav-item-mobile.active,
+.nav-item-mobile.active .material-symbols-rounded,
+.nav-item-mobile.active .small {
+    color: var(--bs-success) !important;
+    font-weight: 600;
+}
+
+.scan-wrapper {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 20px;
+}
+
+.scan-button {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bs-success);
+    color: white !important;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(28, 193, 155, 0.4);
+    transition: background-color 0.2s ease;
+}
+
+.scan-button .material-symbols-rounded {
+    font-size: 2rem;
+}
+
+.scan-button.active {
+    background-color: #159a7a;
+}

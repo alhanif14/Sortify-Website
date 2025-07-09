@@ -1,0 +1,30 @@
+/* Styling untuk Halaman Pengetahuan (Knowledge Page) */
+
+/* Menggunakan .knowledge-page untuk meningkatkan spesifisitas */
+.knowledge-page .card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border-width: 2px !important;
+}
+
+/* Aturan hover yang sekarang jauh lebih spesifik dan akan bekerja */
+.knowledge-page .card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.knowledge-page .knowledge-card-img {
+    height: 200px;
+    object-fit: cover;
+}
+
+.knowledge-page .fun-fact-box {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border-left: 4px solid;
+    font-size: 0.9rem;
+}
+
+.knowledge-page .fun-fact-box.bg-primary-subtle { border-color: var(--bs-primary); }
+.knowledge-page .fun-fact-box.bg-warning-subtle { border-color: var(--bs-warning); }
+.knowledge-page .fun-fact-box.bg-success-subtle { border-color: var(--bs-success); }
+.knowledge-page .fun-fact-box.bg-secondary-subtle { border-color: var(--bs-secondary); }
