@@ -1,4 +1,5 @@
 from fasthtml.common import *
+import os
 from function.landing import landing_section, dashboard_section
 from function.component import navbar, navbar_mobile
 from routes.scan_routes import scan_routes
@@ -10,10 +11,12 @@ from routes.auth_routes import auth_routes
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.responses import RedirectResponse
 import uvicorn
+from dotenv import load_dotenv
+load_dotenv()
 
 app, rt = fast_app(live=True, pico=False)
 
-app.add_middleware(SessionMiddleware, secret_key="sortify-secret-key")
+app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY"))
 
 landing_routes(rt)
 scan_routes(rt)
