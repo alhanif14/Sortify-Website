@@ -50,8 +50,10 @@ def register_content(error_message="", success_message=""):
             Button("Sign up", cls="btn-submit"),
 
             Div(Hr(), Span("or"), Hr(), cls="separator"),
-            Div(I("google", cls="material-symbols-rounded icon-social"), cls="social-icons"),
-
+            A(
+                Img(src="/static/logo/google.svg", cls="icon-social"), 
+                cls="social-icons"
+            ),
             P(
                 "Already have an account? ",
                 A("Sign in", href="/login", hx_get="/login", hx_target="#mainContent", cls="link"),
@@ -96,7 +98,10 @@ def login_content(error_message=""):
             Button("Login", cls="btn-submit"),
 
             Div(Hr(), Span("or"), Hr(), cls="separator"),
-            Div(I("google", cls="material-symbols-rounded icon-social"), cls="social-icons"),
+            A(
+                Img(src="/static/logo/google.svg", cls="icon-social"), 
+                cls="social-icons"
+            ),
 
             P(
                 "Don't have an account? ",

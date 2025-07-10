@@ -79,13 +79,12 @@ def terms_and_conditions_modal(reward):
 def reward_card(reward):
     modal_id = f"modal-{reward['id']}"
     return Div(
-        Img(src=reward["img_src"], cls="card-img-top reward-card-img", alt=reward["title"]),
         Div(
             H5(reward["title"], cls="card-title fw-bold"),
             P(reward["description"], cls="card-text text-muted small"),
             Div(
                 Span(f"{reward['points']:,} Poin", cls="fw-bold fs-5 text-success"),
-                A("Lihat Detail", href="#", cls="btn-link text-decoration-none small", data_bs_toggle="modal", data_bs_target=f"#{modal_id}"),
+                A("See Details", href="#", cls="btn-link text-decoration-none small", data_bs_toggle="modal", data_bs_target=f"#{modal_id}"),
                 cls="d-flex justify-content-between align-items-center mt-3"
             ),
             Div(
