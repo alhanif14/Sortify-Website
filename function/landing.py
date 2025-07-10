@@ -47,7 +47,6 @@ def landing_stats():
         cls="py-5 bg-success bg-opacity-10"
     )
 
-
 def landing_features():
     features_data = [
         {
@@ -122,10 +121,7 @@ def landing_testimonials():
     def testi_card(data):
         return Div(
             Div(
-            Div(
-                Span("format_quote", cls="material-symbols-rounded fs-1 text-success"), 
-                cls="text-center mb-1"
-            ),
+                Div(Span("format_quote", cls="material-symbols-rounded fs-1 text-success"), cls="text-center mb-1"),
                 P(f'"{data["quote"]}"', cls="mb-4 fst-italic"),
                 Div(
                     Img(src="https://placehold.co/50x50/E2E8F0/475569?text=AV", cls="rounded-circle me-3"),
@@ -177,7 +173,9 @@ def landing_section(user=None):
     )
 
 
-
+# ==============================================================================
+# DASHBOARD SECTION
+# ==============================================================================
 def dashboard_header():
     return Div(
         Div(
@@ -317,64 +315,79 @@ def leaderboard_card():
         cls="card-body"
     )
 
+# --- PERUBAHAN KUNCI DI SINI ---
 def charts_script():
+    # Menghapus pembungkus 'DOMContentLoaded'
+    # Skrip ini akan langsung berjalan saat HTMX memuatnya
     return Script("""
-    document.addEventListener('DOMContentLoaded', function() {
-        if (typeof Chart === 'undefined') {
-            console.error('Chart.js is not loaded.');
-            return; // Sekarang ini valid karena berada di dalam fungsi
+        // Fungsi untuk menginisialisasi chart
+        function initCharts() {
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js is not loaded.');
+                return;
+            }
+
+            // Hancurkan chart lama jika ada untuk menghindari duplikasi
+            if (window.weeklyChart instanceof Chart) {
+                window.weeklyChart.destroy();
+            }
+            if (window.binChart instanceof Chart) {
+                window.binChart.destroy();
+            }
+
+            // 1. Grafik Pembuangan Mingguan (Bar Chart)
+            const weeklyDisposalCtx = document.getElementById('weeklyDisposalChart')?.getContext('2d');
+            if (weeklyDisposalCtx) {
+                window.weeklyChart = new Chart(weeklyDisposalCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [{
+                            label: 'Disposals',
+                            data: [12, 19, 35, 18, 11, 29, 24],
+                            backgroundColor: 'rgba(13, 110, 253, 0.2)',
+                            borderColor: 'rgba(13, 110, 253, 1)',
+                            borderWidth: 2,
+                            borderRadius: 8,
+                            barThickness: 20,
+                        }]
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        plugins: { legend: { display: false } }, 
+                        scales: { y: { beginAtZero: true }, x: { grid: { display: false } } } 
+                    }
+                });
+            }
+
+            // 2. Grafik Ketersediaan Tempat Sampah (Doughnut Chart)
+            const binAvailabilityCtx = document.getElementById('binAvailabilityChart')?.getContext('2d');
+            if(binAvailabilityCtx) {
+                window.binChart = new Chart(binAvailabilityCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Paper', 'Recycle', 'Organic', 'Others'],
+                        datasets: [{
+                            data: [60, 80, 90, 70],
+                            backgroundColor: ['#FFC107', '#0D6EFD', '#198754', '#6C757D'],
+                            borderColor: '#FFFFFF',
+                            borderWidth: 4,
+                            hoverOffset: 8
+                        }]
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        cutout: '75%', 
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } } 
+                    }
+                });
+            }
         }
 
-        // 1. Grafik Pembuangan Mingguan (Bar Chart)
-        const weeklyDisposalCtx = document.getElementById('weeklyDisposalChart')?.getContext('2d');
-        if (weeklyDisposalCtx) {
-            new Chart(weeklyDisposalCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                    datasets: [{
-                        label: 'Disposals',
-                        data: [12, 19, 35, 18, 11, 29, 24],
-                        backgroundColor: 'rgba(13, 110, 253, 0.2)',
-                        borderColor: 'rgba(13, 110, 253, 1)',
-                        borderWidth: 2,
-                        borderRadius: 8,
-                        barThickness: 20,
-                    }]
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    plugins: { legend: { display: false } }, 
-                    scales: { y: { beginAtZero: true }, x: { grid: { display: false } } } 
-                }
-            });
-        }
-
-        // 2. Grafik Ketersediaan Tempat Sampah (Doughnut Chart)
-        const binAvailabilityCtx = document.getElementById('binAvailabilityChart')?.getContext('2d');
-        if(binAvailabilityCtx) {
-            new Chart(binAvailabilityCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Paper', 'Recycle', 'Organic', 'Others'],
-                    datasets: [{
-                        data: [60, 80, 90, 70],
-                        backgroundColor: ['#FFC107', '#0D6EFD', '#198754', '#6C757D'],
-                        borderColor: '#FFFFFF',
-                        borderWidth: 4,
-                        hoverOffset: 8
-                    }]
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    cutout: '75%', 
-                    plugins: { legend: { display: false }, tooltip: { enabled: false } } 
-                }
-            });
-        }
-    });
+        // Panggil fungsi inisialisasi secara langsung
+        initCharts();
     """)
 
 def dashboard_section():
