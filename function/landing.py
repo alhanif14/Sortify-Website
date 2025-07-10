@@ -1,5 +1,10 @@
 from fasthtml.common import *
 from function.component import ScrollTop
+from database.database import get_db_session
+from database.models import User, WasteDetectionLog
+from sqlalchemy import desc
+from datetime import datetime, timedelta
+import json
 
 def landing_hero():
     return Div(
@@ -240,6 +245,35 @@ def disposal_logs_card():
         cls="card-body"
     )
 
+def leaderboard_card(leaders):
+    def leader_item(leader, rank):
+        initials = "".join([name[0] for name in leader.username.split()[:2]]).upper()
+        return Div(
+            Div(
+                Img(src=f"https://placehold.co/40x40/E2E8F0/475569?text={initials}", alt=leader.username, cls="rounded-circle me-3"),
+                Div(
+                    P(leader.username, cls="fw-semibold mb-0"),
+                    P(f"Rank {rank}", cls="small text-muted mb-0")
+                ),
+                cls="d-flex align-items-center"
+            ),
+            Span(f"{leader.point:,} pts", cls="fw-bold text-success"),
+            cls="d-flex align-items-center justify-content-between"
+        )
+
+    return Div(
+        Div(
+            H5("Leaderboard", cls="card-title fw-bold"),
+            A("See All", href="#", cls="btn-link text-decoration-none"),
+            cls="d-flex justify-content-between align-items-center mb-3"
+        ),
+        Div(
+            *[leader_item(leader, i + 1) for i, leader in enumerate(leaders)],
+            cls="vstack gap-3"
+        ),
+        cls="card-body"
+    )
+
 def bin_availability_card():
     waste_types = [
         {"name": "Paper", "percentage": "60%", "color": "warning"},
@@ -275,114 +309,81 @@ def bin_availability_card():
         cls="card-body"
     )
 
-def leaderboard_card():
-    leaders = [
-        {"name": "Andi Wijaya", "rank": 1, "points": "+2,530 pts", "avatar": "AW", "color": "198754"},
-        {"name": "Budi Hartono", "rank": 2, "points": "+2,150 pts", "avatar": "BH", "color": "0D6EFD"},
-        {"name": "Citra Lestari", "rank": 3, "points": "+1,980 pts", "avatar": "CL", "color": "FFC107"},
-        {"name": "Dewi Anggraini", "rank": 4, "points": "+1,760 pts", "avatar": "DA", "color": "6C757D"},
-    ]
-    
-    def leader_item(leader):
-        return Div(
-            Div(
-                Img(src=f"https://placehold.co/32x32/E2E8F0/475569?text={leader['avatar']}", alt=leader["name"], cls="rounded-circle me-3"),
-                Div(
-                    P(leader["name"], cls="fw-semibold mb-0"),
-                    P(f"Rank {leader['rank']}", cls="small text-muted mb-0")
-                ),
-                cls="d-flex align-items-center"
-            ),
-            Span(leader["points"], cls="fw-bold text-success"),
-            cls="d-flex align-items-center justify-content-between"
-        )
-
-    return Div(
-        Div(
-            H5("Leaderboard", cls="card-title fw-bold"),
-            A("See All", href="#", cls="btn-link text-decoration-none"),
-            cls="d-flex justify-content-between align-items-center mb-3"
-        ),
-        Div(*[leader_item(leader) for leader in leaders], cls="vstack gap-3"),
-        cls="card-body"
-    )
-
-# --- PERUBAHAN KUNCI DI SINI ---
-def charts_script():
-    # Menghapus pembungkus 'DOMContentLoaded'
-    # Skrip ini akan langsung berjalan saat HTMX memuatnya
-    return Script("""
-        // Fungsi untuk menginisialisasi chart
-        function initCharts() {
-            if (typeof Chart === 'undefined') {
+def charts_script(chart_labels, chart_data):
+    return Script(f"""
+        function initDashboardCharts() {{
+            if (typeof Chart === 'undefined') {{
                 console.error('Chart.js is not loaded.');
                 return;
-            }
+            }}
 
-            // Hancurkan chart lama jika ada untuk menghindari duplikasi
-            if (window.weeklyChart instanceof Chart) {
-                window.weeklyChart.destroy();
-            }
-            if (window.binChart instanceof Chart) {
-                window.binChart.destroy();
-            }
+            if (window.weeklyChart instanceof Chart) window.weeklyChart.destroy();
+            if (window.binChart instanceof Chart) window.binChart.destroy();
 
-            // 1. Grafik Pembuangan Mingguan (Bar Chart)
             const weeklyDisposalCtx = document.getElementById('weeklyDisposalChart')?.getContext('2d');
-            if (weeklyDisposalCtx) {
-                window.weeklyChart = new Chart(weeklyDisposalCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                        datasets: [{
-                            label: 'Disposals',
-                            data: [12, 19, 35, 18, 11, 29, 24],
-                            backgroundColor: 'rgba(13, 110, 253, 0.2)',
-                            borderColor: 'rgba(13, 110, 253, 1)',
-                            borderWidth: 2,
-                            borderRadius: 8,
-                            barThickness: 20,
-                        }]
-                    },
-                    options: { 
-                        responsive: true, 
-                        maintainAspectRatio: false, 
-                        plugins: { legend: { display: false } }, 
-                        scales: { y: { beginAtZero: true }, x: { grid: { display: false } } } 
-                    }
-                });
-            }
+            if (weeklyDisposalCtx) {{
+                const labels = {json.dumps(chart_labels)};
+                const data = {json.dumps(chart_data)};
 
-            // 2. Grafik Ketersediaan Tempat Sampah (Doughnut Chart)
+                window.weeklyChart = new Chart(weeklyDisposalCtx, {{
+                    type: 'bar',
+                    data: {{
+                        labels: labels,
+                        datasets: [{{
+                            label: 'Disposals', data: data,
+                            backgroundColor: 'rgba(25, 135, 84, 0.2)',
+                            borderColor: 'rgba(25, 135, 84, 1)',
+                            borderWidth: 2, borderRadius: 8, barThickness: 20,
+                        }}]
+                    }},
+                    options: {{ responsive: true, maintainAspectRatio: false, plugins: {{ legend: {{ display: false }} }}, scales: {{ y: {{ beginAtZero: true }}, x: {{ grid: {{ display: false }} }} }} }}
+                }});
+            }}
+
             const binAvailabilityCtx = document.getElementById('binAvailabilityChart')?.getContext('2d');
-            if(binAvailabilityCtx) {
-                window.binChart = new Chart(binAvailabilityCtx, {
+            if(binAvailabilityCtx) {{
+                window.binChart = new Chart(binAvailabilityCtx, {{
                     type: 'doughnut',
-                    data: {
+                    data: {{
                         labels: ['Paper', 'Recycle', 'Organic', 'Others'],
-                        datasets: [{
+                        datasets: [{{
                             data: [60, 80, 90, 70],
                             backgroundColor: ['#FFC107', '#0D6EFD', '#198754', '#6C757D'],
-                            borderColor: '#FFFFFF',
-                            borderWidth: 4,
-                            hoverOffset: 8
-                        }]
-                    },
-                    options: { 
-                        responsive: true, 
-                        maintainAspectRatio: false, 
-                        cutout: '75%', 
-                        plugins: { legend: { display: false }, tooltip: { enabled: false } } 
-                    }
-                });
-            }
-        }
+                            borderColor: '#FFFFFF', borderWidth: 4, hoverOffset: 8
+                        }}]
+                    }},
+                    options: {{ responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: {{ legend: {{ display: false }}, tooltip: {{ enabled: false }} }} }}
+                }});
+            }}
+        }}
 
-        // Panggil fungsi inisialisasi secara langsung
-        initCharts();
+        initDashboardCharts();
     """)
 
 def dashboard_section():
+    db = get_db_session()
+    try:
+        top_leaders = db.query(User).order_by(desc(User.point)).limit(5).all()
+
+        today = datetime.now()
+        seven_days_ago = today - timedelta(days=7)
+        daily_counts = {(today - timedelta(days=i)).strftime('%a'): 0 for i in range(7)}
+        day_labels = [(today - timedelta(days=i)).strftime('%a') for i in range(6, -1, -1)]
+        logs = db.query(WasteDetectionLog).all()
+        for log in logs:
+            if not isinstance(log.timestamp, datetime):
+                continue
+
+            log_timestamp = log.timestamp
+            if log_timestamp >= seven_days_ago:
+                day_name = log_timestamp.strftime('%a')
+                if day_name in daily_counts:
+                    daily_counts[day_name] += 1
+
+        final_chart_data = [daily_counts[day] for day in day_labels]
+    finally:
+        db.close()
+
     return Div(
         ScrollTop(),
         dashboard_header(),
@@ -394,11 +395,11 @@ def dashboard_section():
             ),
             Div(
                 Div(bin_availability_card(), cls="card shadow-sm mb-4"),
-                Div(leaderboard_card(), cls="card shadow-sm"),
+                Div(leaderboard_card(leaders=top_leaders), cls="card shadow-sm"),
                 cls="col-lg-4"
             ),
             cls="row g-4"
         ),
-        charts_script(),
+        charts_script(chart_labels=day_labels, chart_data=final_chart_data),
         cls="container-fluid p-4"
     )
