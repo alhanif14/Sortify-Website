@@ -10,7 +10,6 @@ def profile_routes(rt):
         if not user_id:
             return RedirectResponse(url="/login", status_code=302)
         
-        # ✅ Gunakan context manager yang konsisten
         db = get_db_session()
         try:
             user = db.query(User).filter(User.id == user_id).first()
@@ -18,7 +17,6 @@ def profile_routes(rt):
             if not user:
                 return RedirectResponse(url="/login", status_code=302)
 
-            # ✅ Return FastHTML component directly, bukan template
             return profile_section(user)
         finally:
             db.close()
