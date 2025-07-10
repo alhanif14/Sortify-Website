@@ -9,7 +9,8 @@ from routes.know_routes import know_routes
 from routes.profile_routes import profile_routes
 from routes.auth_routes import auth_routes
 from starlette.middleware.sessions import SessionMiddleware
-from database.database import get_current_user
+from database.database import get_current_user, Base, engine
+from database.models import models
 from starlette.responses import RedirectResponse
 import uvicorn
 from dotenv import load_dotenv
@@ -72,6 +73,8 @@ def landing(request):
         main_content(user),
         ),
     )
+
+Base.metadata.create_all(bind=engine)
 
 if __name__ == '__main__':
     uvicorn.run(app, host="0.0.0.0")
