@@ -5,7 +5,6 @@ rewards_data = [
     {
         "id": "voucher_50k",
         "title": "Shopping Voucher IDR 50.000",
-        "img_src": "/static/product/conjur.png",
         "points": 2500,
         "description": "Redeem your points for a shopping voucher at nearby convenience stores.",
         "terms": [
@@ -18,7 +17,6 @@ rewards_data = [
     {
         "id": "gopay_balance",
         "title": "GoPay Balance IDR 25.000",
-        "img_src": "/static/product/port.png",
         "points": 1500,
         "description": "Get free GoPay balance to shop or pay bills.",
         "terms": [
@@ -30,7 +28,6 @@ rewards_data = [
     {
         "id": "donation_tree",
         "title": "Donation of 1 Tree",
-        "img_src": "/static/asset/asset-banner2.png",
         "points": 1000,
         "description": "Convert your points to plant one tree in your name.",
         "terms": [
@@ -42,7 +39,6 @@ rewards_data = [
     {
         "id": "merchandise_totebag",
         "title": "Exclusive Sortify Totebag",
-        "img_src": "/static/product/port.png",
         "points": 3000,
         "description": "Take home a cool eco-friendly tote bag from Sortify.",
         "terms": [
