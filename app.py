@@ -10,7 +10,7 @@ from routes.profile_routes import profile_routes
 from routes.auth_routes import auth_routes
 from starlette.middleware.sessions import SessionMiddleware
 from database.database import get_current_user, Base, engine
-from database.models import models
+from database import models
 from starlette.responses import RedirectResponse
 import uvicorn
 from dotenv import load_dotenv
