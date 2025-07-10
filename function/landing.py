@@ -172,19 +172,11 @@ def landing_section(user=None):
         cls="landing-page"
     )
 
-
-# ==============================================================================
-# DASHBOARD SECTION
-# ==============================================================================
 def dashboard_header():
     return Div(
         Div(
             H1("Dashboard", cls="fw-bold mb-1"),
             P("Welcome back, here's your waste management overview.", cls="text-muted")
-        ),
-        Div(
-            Input(type="text", placeholder="Search...", cls="form-control w-100 w-sm-auto"),
-            cls="mt-3 mt-sm-0"
         ),
         cls="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4"
     )
