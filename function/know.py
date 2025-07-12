@@ -4,7 +4,7 @@ from function.component import ScrollTop
 knowledge_data = [
     {
         "title": "Plastic Waste",
-        "image_src": "/static/knowledge/plastiac.png",
+        "image_src": "/static/knowledge/plastic.png",
         "description": "Plastic waste is all used items made from plastic, such as bottles, packaging, and plastic bags. This material is very difficult to decompose and can last hundreds of years in the environment.",
         "examples": "Water bottles, food wrappers, straws, plastic bags.",
         "fun_fact": "Every minute, one million plastic bottles are bought around the world!",
@@ -20,7 +20,7 @@ knowledge_data = [
     },
     {
         "title": "Organic Waste",
-        "image_src": "/static/knowledge/organic.png",
+        "image_src": "/static/knowledge/organic.jpg",
         "description": "Organic waste is all material that can decompose naturally, originating from plants or animals. This waste can be processed into compost to enrich the soil.",
         "examples": "Fruit and vegetable scraps, dry leaves, coffee grounds, eggshells.",
         "fun_fact": "In some countries, organic waste accounts for more than 50% of total household waste!",
