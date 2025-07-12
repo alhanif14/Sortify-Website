@@ -16,6 +16,6 @@ class WasteDetectionLog(Base):
     id = Column(Integer, primary_key=True, index=True)
     timestamp = Column(DateTime, nullable=False)
     waste_type = Column(String, nullable=False)
-    qr_code = Column(String, nullable=False)
-    username = Column(String, nullable=False)
+    qr_code = Column(String, nullable=True)
+    username = Column(String, nullable=True)
     point = Column(Integer, default=0)
