@@ -4,7 +4,7 @@ from function.component import ScrollTop
 knowledge_data = [
     {
         "title": "Plastic Waste",
-        "image_src": "/static/knowledge/plastic.png",
+        "image_src": "/static/knowledge/plastic.jpg",
         "description": "Plastic waste is all used items made from plastic, such as bottles, packaging, and plastic bags. This material is very difficult to decompose and can last hundreds of years in the environment.",
         "examples": "Water bottles, food wrappers, straws, plastic bags.",
         "fun_fact": "Every minute, one million plastic bottles are bought around the world!",
