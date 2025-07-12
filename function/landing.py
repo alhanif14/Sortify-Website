@@ -56,7 +56,7 @@ def landing_features():
     features_data = [
         {
             "title": "Smart & Fast Scanning",
-            "desc": "No more confusion. Just point your camera at your trash, and our AI will instantly recognize its type and guide you on proper disposal.",
+            "desc": "No more confusion. Just dispose your waste at sortify, and our system will instantly recognize its type and dispose it with proper sorting.",
             "img_src": "/static/landing/feature-scan.png"
         },
         {
@@ -186,39 +186,48 @@ def dashboard_header():
         cls="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4"
     )
 
-def weekly_disposal_card():
-    return Div(
-        H5("Weekly Disposal", cls="card-title fw-bold"),
-        P("Number of disposals in the last 7 days.", cls="card-subtitle mb-4 text-muted"),
-        Div(
-            Canvas(id="weeklyDisposalChart"),
-            style="height: 20rem;"
-        ),
-        cls="card-body"
-    )
+def time_ago(ts):
+    try:
+        t = datetime.fromisoformat(ts) if isinstance(ts, str) else ts
+        delta = datetime.now() - t
+        seconds = delta.total_seconds()
+        if seconds < 60:
+            return f"{int(seconds)} seconds ago"
+        elif seconds < 3600:
+            return f"{int(seconds // 60)} minutes ago"
+        elif seconds < 86400:
+            return f"{int(seconds // 3600)} hours ago"
+        else:
+            return f"{int(seconds // 86400)} days ago"
+    except Exception:
+        return "Unknown time"
 
-def disposal_logs_card():
-    logs = [
-        {"id": "#A8B2C1", "user": "Budi Hartono", "avatar": "BH", "type": "Recycle", "time": "2 minutes ago", "color": "primary"},
-        {"id": "#D4E5F6", "user": "Citra Lestari", "avatar": "CL", "type": "Organic", "time": "15 minutes ago", "color": "success"},
-        {"id": "#G7H8I9", "user": "Dewi Anggraini", "avatar": "DA", "type": "Paper", "time": "1 hour ago", "color": "warning"},
-        {"id": "#J1K2L3", "user": "Eko Prasetyo", "avatar": "EP", "type": "Others", "time": "3 hours ago", "color": "secondary"},
-    ]
-    
+def get_color(waste_type):
+    mapping = {
+        "Recycle": "primary",
+        "Organic": "success",
+        "Paper": "warning",
+        "Others": "secondary"
+    }
+    return mapping.get(waste_type.capitalize(), "secondary")
+
+def disposal_logs_card(logs):
     def log_row(log):
-        badge_class = f"badge text-bg-{log['color']}"
+        username = log.username or "Unknown"
+        initials = "".join([name[0] for name in username.split()[:2]]).upper()
+        badge_class = f"badge text-bg-{get_color(log.waste_type)}"
         return Tr(
-            Td(log["id"], cls="align-middle small text-muted"),
+            Td(f"#{log.id}", cls="align-middle small text-muted"),
             Td(
                 Div(
-                    Img(src=f"https://placehold.co/32x32/E2E8F0/475569?text={log['avatar']}", alt=log["user"], cls="rounded-circle me-3"),
-                    Span(log["user"], cls="fw-medium"),
+                    Img(src=f"https://placehold.co/32x32/E2E8F0/475569?text={initials}", alt=username, cls="rounded-circle me-3"),
+                    Span(username, cls="fw-medium"),
                     cls="d-flex align-items-center"
                 ),
                 cls="align-middle"
             ),
-            Td(Span(log["type"], cls=badge_class), cls="align-middle"),
-            Td(log["time"], cls="align-middle small text-muted"),
+            Td(Span(log.waste_type.capitalize(), cls=badge_class), cls="align-middle"),
+            Td(time_ago(log.timestamp), cls="align-middle small text-muted"),
         )
 
     return Div(
@@ -238,9 +247,20 @@ def disposal_logs_card():
                     )
                 ),
                 Tbody(*[log_row(log) for log in logs]),
-                cls="table table-borderless table-hover" 
+                cls="table table-borderless table-hover"
             ),
             cls="table-responsive"
+        ),
+        cls="card-body"
+    )
+
+def weekly_disposal_card():
+    return Div(
+        H5("Weekly Disposal", cls="card-title fw-bold"),
+        P("Number of disposals in the last 7 days.", cls="card-subtitle mb-4 text-muted"),
+        Div(
+            Canvas(id="weeklyDisposalChart"),
+            style="height: 20rem;"
         ),
         cls="card-body"
     )
@@ -267,10 +287,7 @@ def leaderboard_card(leaders):
             A("See All", href="#", cls="btn-link text-decoration-none"),
             cls="d-flex justify-content-between align-items-center mb-3"
         ),
-        Div(
-            *[leader_item(leader, i + 1) for i, leader in enumerate(leaders)],
-            cls="vstack gap-3"
-        ),
+        Div(*[leader_item(leader, i + 1) for i, leader in enumerate(leaders)], cls="vstack gap-3"),
         cls="card-body"
     )
 
@@ -312,10 +329,7 @@ def bin_availability_card():
 def charts_script(chart_labels, chart_data):
     return Script(f"""
         function initDashboardCharts() {{
-            if (typeof Chart === 'undefined') {{
-                console.error('Chart.js is not loaded.');
-                return;
-            }}
+            if (typeof Chart === 'undefined') return;
 
             if (window.weeklyChart instanceof Chart) window.weeklyChart.destroy();
             if (window.binChart instanceof Chart) window.binChart.destroy();
@@ -327,21 +341,13 @@ def charts_script(chart_labels, chart_data):
 
                 window.weeklyChart = new Chart(weeklyDisposalCtx, {{
                     type: 'bar',
-                    data: {{
-                        labels: labels,
-                        datasets: [{{
-                            label: 'Disposals', data: data,
-                            backgroundColor: 'rgba(25, 135, 84, 0.2)',
-                            borderColor: 'rgba(25, 135, 84, 1)',
-                            borderWidth: 2, borderRadius: 8, barThickness: 20,
-                        }}]
-                    }},
+                    data: {{ labels, datasets: [{{ label: 'Disposals', data, backgroundColor: 'rgba(25,135,84,0.2)', borderColor: 'rgba(25,135,84,1)', borderWidth: 2, borderRadius: 8, barThickness: 20 }}] }},
                     options: {{ responsive: true, maintainAspectRatio: false, plugins: {{ legend: {{ display: false }} }}, scales: {{ y: {{ beginAtZero: true }}, x: {{ grid: {{ display: false }} }} }} }}
                 }});
             }}
 
             const binAvailabilityCtx = document.getElementById('binAvailabilityChart')?.getContext('2d');
-            if(binAvailabilityCtx) {{
+            if (binAvailabilityCtx) {{
                 window.binChart = new Chart(binAvailabilityCtx, {{
                     type: 'doughnut',
                     data: {{
@@ -356,7 +362,6 @@ def charts_script(chart_labels, chart_data):
                 }});
             }}
         }}
-
         initDashboardCharts();
     """)
 
@@ -369,18 +374,24 @@ def dashboard_section():
         seven_days_ago = today - timedelta(days=7)
         daily_counts = {(today - timedelta(days=i)).strftime('%a'): 0 for i in range(7)}
         day_labels = [(today - timedelta(days=i)).strftime('%a') for i in range(6, -1, -1)]
-        logs = db.query(WasteDetectionLog).all()
-        for log in logs:
-            if not isinstance(log.timestamp, datetime):
-                continue
 
-            log_timestamp = log.timestamp
-            if log_timestamp >= seven_days_ago:
-                day_name = log_timestamp.strftime('%a')
+        logs = db.query(WasteDetectionLog).all()
+        recent_logs = db.query(WasteDetectionLog).order_by(desc(WasteDetectionLog.timestamp)).limit(5).all()
+
+        for log in logs:
+            if not isinstance(log.timestamp, str):
+                continue
+            try:
+                ts = datetime.fromisoformat(log.timestamp)
+            except:
+                continue
+            if ts >= seven_days_ago:
+                day_name = ts.strftime('%a')
                 if day_name in daily_counts:
                     daily_counts[day_name] += 1
 
         final_chart_data = [daily_counts[day] for day in day_labels]
+
     finally:
         db.close()
 
@@ -390,16 +401,16 @@ def dashboard_section():
         Div(
             Div(
                 Div(weekly_disposal_card(), cls="card shadow-sm mb-4"),
-                Div(disposal_logs_card(), cls="card shadow-sm"),
+                Div(disposal_logs_card(recent_logs), cls="card shadow-sm"),
                 cls="col-lg-8"
             ),
             Div(
                 Div(bin_availability_card(), cls="card shadow-sm mb-4"),
-                Div(leaderboard_card(leaders=top_leaders), cls="card shadow-sm"),
+                Div(leaderboard_card(top_leaders), cls="card shadow-sm"),
                 cls="col-lg-4"
             ),
             cls="row g-4"
         ),
-        charts_script(chart_labels=day_labels, chart_data=final_chart_data),
+        charts_script(day_labels, final_chart_data),
         cls="container-fluid p-4"
     )

@@ -56,7 +56,7 @@ def terms_and_conditions_modal(reward):
             Div(
                 # Header Modal
                 Div(
-                    H5(f"Syarat & Ketentuan", cls="modal-title fw-bold", id=f"{modal_id}-label"),
+                    H5(f"Term & Condition", cls="modal-title fw-bold", id=f"{modal_id}-label"),
                     Button(type="button", cls="btn-close", data_bs_dismiss="modal", aria_label="Close")
                 , cls="modal-header"),
                 # Body Modal

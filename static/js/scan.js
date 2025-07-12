@@ -1,4 +1,6 @@
-let currentStream = null; // Global untuk simpan stream aktif
+let currentStream = null;
+
+console.log("✅ scan.js loaded!");
 
 function detectQRCode(video) {
     const canvas = document.createElement("canvas");
@@ -12,7 +14,7 @@ function detectQRCode(video) {
             video.srcObject.getTracks().forEach(track => track.stop());
             video.srcObject = null;
             currentStream = null;
-            console.log("Kamera dihentikan.");
+            console.log("📷 Kamera dihentikan.");
         }
     }
 
@@ -22,43 +24,70 @@ function detectQRCode(video) {
         const qrCode = jsQR(imageData.data, canvas.width, canvas.height);
 
         if (qrCode) {
+            console.log("🎯 QR Detected:", qrCode.data);
+
             try {
                 const data = JSON.parse(qrCode.data);
+                console.log("✅ Parsed Data:", data);
+
                 const wasteTypes = data.waste_type || [];
                 const point = data.point || 0;
                 const timestamp = data.timestamp || null;
                 const disposeId = data.id || null;
 
-                console.log("✅ QR Code Data:", data);
+                stopCamera(); // 🛑 Stop kamera agar tidak scan ulang
 
-                stopCamera(); // stop camera saat berhasil scan
-
-                // ✅ Build parameters for the request
                 const params = new URLSearchParams({
                     waste_type: wasteTypes.join(","),
-                    point: point.toString()
+                    point: point.toString(),
                 });
-                
+
                 if (timestamp) {
-                    params.append('timestamp', timestamp.toString());
+                    params.append("timestamp", timestamp.toString());
                 }
-                
                 if (disposeId) {
-                    params.append('id', disposeId.toString());
+                    params.append("id", disposeId.toString());
                 }
 
-                console.log("✅ Redirecting to scan_result with params:", params.toString());
+                console.log("👉 Calling /process_scan with:", params.toString());
 
-                // ✅ Option 1: Direct to scan_result (points added there)
-                htmx.ajax("GET", "/scan_result?" + params.toString(), {
-                    target: "#mainContent",
-                    swap: "innerHTML"
-                });
+                fetch("/process_scan?" + params.toString())
+                    .then(response => {
+                        if (!response.ok) throw new Error("Fetch failed: " + response.status);
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("✅ Response from /process_scan:", data);
 
-                return; // stop loop
+                        if (data.status === "ok") {
+                            const resultParams = new URLSearchParams({
+                                waste_type: data.waste_type,
+                                point: data.point,
+                                timestamp: data.timestamp,
+                                id: data.id
+                            });
+
+                            console.log("👉 Navigating to /scan_result with:", resultParams.toString());
+
+                            htmx.ajax("GET", "/scan_result?" + resultParams.toString(), {
+                                target: "#mainContent",
+                                swap: "innerHTML"
+                            });
+                        } else {
+                            console.error("❌ Error from /process_scan:", data.message);
+                            alert("Gagal proses scan: " + data.message);
+                        }
+                    })
+                    .catch(err => {
+                        console.error("❌ Fetch error:", err);
+                        alert("Gagal mengirim data ke server: " + err.message);
+                    });
+
+                return;
+
             } catch (e) {
-                console.error("❌ QR tidak berisi JSON valid:", e);
-                alert("QR Code tidak valid. Pastikan QR code berisi data yang benar.");
+                console.error("❌ QR parsing error:", e);
+                alert("QR tidak valid.");
             }
         }
 
@@ -68,10 +97,12 @@ function detectQRCode(video) {
     scanFrame();
 }
 
-document.body.addEventListener("htmx:afterSwap", function (evt) {
+function startCameraAndDetect() {
     const video = document.getElementById("camera");
-
-    if (!video) return;
+    if (!video) {
+        console.log("🚫 Elemen video dengan id 'camera' tidak ditemukan.");
+        return;
+    }
 
     console.log("🎥 Memulai kamera...");
 
@@ -90,13 +121,23 @@ document.body.addEventListener("htmx:afterSwap", function (evt) {
             console.error("❌ Gagal membuka kamera:", err);
             alert("Tidak dapat mengakses kamera. Periksa izin browser dan pastikan menggunakan HTTPS.");
         });
+}
+
+// 🌀 Mulai kamera ulang setelah HTMX swap (misalnya setelah buka /scan)
+document.body.addEventListener("htmx:afterSwap", function (evt) {
+    console.log("🎯 HTMX swap complete. Checking for #camera...");
+    const video = document.getElementById("camera");
+    if (video) {
+        console.log("📸 Kamera ditemukan, mulai deteksi QR...");
+        startCameraAndDetect();
+    }
 });
 
-// ✨ Stop kamera saat pindah halaman
+// 🛑 Stop kamera sebelum HTMX ganti halaman
 document.body.addEventListener("htmx:beforeSwap", function (evt) {
     if (currentStream) {
         currentStream.getTracks().forEach(track => track.stop());
         currentStream = null;
-        console.log("🎥 Kamera dimatikan sebelum ganti halaman.");
+        console.log("📷 Kamera dimatikan sebelum ganti halaman.");
     }
 });
