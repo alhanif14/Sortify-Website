@@ -9,12 +9,16 @@ def profile_section(user):
     )
 
 def profile_content(user):
-    # ✅ Ensure point is displayed correctly, handle None values
     user_points = user.point if user.point is not None else 0
-    
+    initials = "".join([part[0] for part in user.username.split()[:2]]).upper()
+
     return Div(
         Div(
-            Img(src="/static/profile/default.png", _class="profile-img"),
+            Img(
+                src=f"https://placehold.co/96x96/1cc19b/FFFFFF?text={initials}",
+                alt=user.username,
+                _class="profile-img rounded-circle"
+            ),
             H2(user.username, _class="profile-name"),
             P(user.email, _class="profile-email"),
             Div(
