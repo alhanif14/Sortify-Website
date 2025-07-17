@@ -379,8 +379,18 @@ def dashboard_section():
         recent_logs = db.query(WasteDetectionLog).order_by(desc(WasteDetectionLog.timestamp)).limit(5).all()
 
         for log in logs:
-            if not isinstance(log.timestamp, str):
-                continue
+            ts = log.timestamp
+            if isinstance(ts, str):
+                try:
+                    ts = datetime.fromisoformat(ts)
+                except ValueError:
+                    continue
+
+            if ts >= seven_days_ago:
+                day_name = ts.strftime('%a')
+                if day_name in daily_counts:
+                    daily_counts[day_name] += 1
+
             try:
                 ts = datetime.fromisoformat(log.timestamp)
             except:

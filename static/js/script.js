@@ -1,17 +1,9 @@
-/**
- * Fungsi utama untuk mengatur link navigasi yang aktif.
- * Fungsi ini dipanggil langsung dari atribut onclick di HTML.
- * @param {string} activePath - Path dari link yang diklik, misal: '/know'.
- */
 function setActiveNav(activePath) {
-    // Ambil SEMUA link navigasi, baik desktop maupun mobile
     const allNavLinks = document.querySelectorAll('[data-path]');
 
     allNavLinks.forEach(link => {
         const linkPath = link.getAttribute('data-path');
 
-        // Jika path link cocok dengan path yang diklik, tambahkan kelas 'active'.
-        // Jika tidak, hapus kelas 'active'.
         if (linkPath === activePath) {
             link.classList.add('active');
         } else {
@@ -21,9 +13,6 @@ function setActiveNav(activePath) {
 }
 
 
-/**
- * Fungsi untuk menangani visibilitas password.
- */
 function initTogglePassword() {
     document.querySelectorAll(".toggle-password").forEach(icon => {
         const newIcon = icon.cloneNode(true);
@@ -45,32 +34,33 @@ function initTogglePassword() {
     });
 }
 
+    function handleScrollTopButton() {
+        const scrollTopButton = document.querySelector('.scrolltop-button');
+        if (!scrollTopButton) return;
 
-// --- EVENT LISTENERS ---
+        const isLargeScreen = window.innerWidth >= 992;
+        const isScrolled = document.body.scrollTop > 20 || document.documentElement.scrollTop > 20;
 
-// 1. Jalankan saat halaman pertama kali dimuat
-document.addEventListener('DOMContentLoaded', () => {
-
-    // Set 'Home' sebagai link aktif secara default saat halaman baru dibuka
-    setActiveNav('/landing');
-    initTogglePassword();
-});
-
-// 2. Jalankan setiap kali konten baru ditambahkan oleh HTMX
-// Ini penting untuk memastikan fungsionalitas seperti toggle password tetap bekerja
-document.body.addEventListener("htmx:afterSwap", () => {
-    initTogglePassword();
-});
-
-// scroll top
-window.onscroll = function() {
-    var scrollTopButton = document.querySelector('.scrolltop-button');
-
-    if (scrollTopButton) {
-        if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-            scrollTopButton.style.display = "block";
+        if (isLargeScreen && isScrolled) {
+            scrollTopButton.style.display = "flex";
         } else {
             scrollTopButton.style.display = "none";
         }
     }
-};
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    setActiveNav('/landing');
+    initTogglePassword();
+    handleScrollTopButton();
+});
+
+document.body.addEventListener("htmx:afterSwap", () => {
+    initTogglePassword();
+});
+
+document.body.addEventListener('htmx:pushedIntoHistory', () => {
+});
+
+window.addEventListener('scroll', handleScrollTopButton);
+window.addEventListener('resize', handleScrollTopButton);
