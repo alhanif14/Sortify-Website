@@ -13,12 +13,11 @@ def scan1_content():
             H3("Scan QR Code", cls="scan1-title"),
             P("Use the scan feature to earn points from the trash you throw away.", cls="scan1-desc"),
             P("💡 Make sure you are logged in to save points to your account.", cls="scan1-warning"),
-            # ✅ Fixed button - should link to login, not scan
             A("Login / Register", 
               href="/login",
               hx_get="/login",
               hx_target="#mainContent", 
-              cls="btn btn-success px-4 py-2 mt-3"),
+              cls="btn btn-success px-4 py-2 mt-3 mb-5"),
             cls="text-center px-3"
         ),
         cls="container-fluids d-flex flex-column align-items-center justify-content-center"
