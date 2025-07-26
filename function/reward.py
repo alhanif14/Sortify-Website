@@ -1,70 +1,38 @@
 from fasthtml.common import *
 from function.component import ScrollTop
+from database.models import User, Voucher
+from datetime import date
 
-rewards_data = [
-    {
-        "id": "voucher_50k",
-        "title": "Shopping Voucher IDR 50.000",
-        "points": 2500,
-        "description": "Redeem your points for a shopping voucher at nearby convenience stores.",
-        "terms": [
-           "Voucher is only valid at Indomaret & Alfamart.",
-            "Cannot be combined with other promotions.",
-            "Voucher is valid for 30 days after redemption.",
-            "Only valid for a single transaction."
-        ]
-    },
-    {
-        "id": "gopay_balance",
-        "title": "GoPay Balance IDR 25.000",
-        "points": 1500,
-        "description": "Get free GoPay balance to shop or pay bills.",
-        "terms": [
-            "Make sure the phone number registered on Sortify matches your GoPay account.",
-            "Balance will be sent within a maximum of 2x24 hours after redemption.",
-            "Sortify is not responsible for any incorrect phone number input."
-        ]
-    },
-    {
-        "id": "donation_tree",
-        "title": "Donation of 1 Tree",
-        "points": 1000,
-        "description": "Convert your points to plant one tree in your name.",
-        "terms": [
-            "The tree will be planted in collaboration with LindungiHutan.",
-            "You will receive a digital certificate in your name.",
-            "The planting location will be determined by our partner."
-        ]
-    },
-    {
-        "id": "merchandise_totebag",
-        "title": "Exclusive Sortify Totebag",
-        "points": 3000,
-        "description": "Take home a cool eco-friendly tote bag from Sortify.",
-        "terms": [
-            "Limited stock, first come first served.",
-            "Shipping costs are borne by the user.",
-            "Estimated delivery 5-7 working days."
-        ]
-    }
-]
+def redeem_alert(message, alert_type="success"):
+    return Div(
+        message,
+        cls=f"alert alert-{alert_type} mt-4",
+        role="alert"
+    )
 
-def terms_and_conditions_modal(reward):
-    modal_id = f"modal-{reward['id']}"
+def user_points_display(user: User):
+    return Div(
+        Span("Your Current Points:", cls="me-2"),
+        Span(f"{user.point:,}", cls="badge bg-success fs-5 rounded-pill"),
+        id="user-points",
+        cls="d-flex justify-content-center align-items-center mt-4",
+    )
+
+def terms_and_conditions_modal(voucher: Voucher):
+    modal_id = f"modal-{voucher.id}"
+    terms_list = voucher.terms_conditions.split('\n') if voucher.terms_conditions else []
+    
     return Div(
         Div(
             Div(
-                # Header Modal
                 Div(
-                    H5(f"Term & Condition", cls="modal-title fw-bold", id=f"{modal_id}-label"),
+                    H5("Term & Condition", cls="modal-title fw-bold", id=f"{modal_id}-label"),
                     Button(type="button", cls="btn-close", data_bs_dismiss="modal", aria_label="Close")
                 , cls="modal-header"),
-                # Body Modal
                 Div(
-                    P(Strong(reward['title']), cls="mb-3"),
-                    Ul(*[Li(term, cls="mb-2") for term in reward['terms']], cls="list-unstyled modal-terms-list")
+                    P(Strong(voucher.title), cls="mb-3"),
+                    Ul(*[Li(term, cls="mb-2") for term in terms_list])
                 , cls="modal-body"),
-                # Footer Modal
                 Div(
                     Button("Close", type="button", cls="btn btn-secondary", data_bs_dismiss="modal")
                 , cls="modal-footer")
@@ -72,50 +40,60 @@ def terms_and_conditions_modal(reward):
         , cls="modal-dialog modal-dialog-centered")
     , id=modal_id, cls="modal fade", tabindex="-1", aria_labelledby=f"{modal_id}-label", aria_hidden="true")
 
-def reward_card(reward):
-    modal_id = f"modal-{reward['id']}"
+def reward_card(voucher: Voucher, user_points: int):
+    modal_id = f"modal-{voucher.id}"
+    can_redeem = user_points >= voucher.point_cost
+
+    redeem_button = Button(
+        "Redeem Points",
+        hx_post=f"/redeem/{voucher.id}",
+        hx_target="#reward-section",
+        hx_swap="outerHTML",
+        hx_confirm=f"Are you sure you want to redeem '{voucher.title}' for {voucher.point_cost} points?",
+        cls=f"btn {'btn-success' if can_redeem else 'btn-secondary'} w-100 fw-semibold mt-3",
+        disabled=not can_redeem,
+        title="Not enough points" if not can_redeem else "Redeem this voucher"
+    )
+
     return Div(
         Div(
-            H5(reward["title"], cls="card-title fw-bold"),
-            P(reward["description"], cls="card-text text-muted small"),
+            H5(voucher.title, cls="card-title fw-bold"),
+            P(voucher.description, cls="card-text text-muted small"),
             Div(
-                Span(f"{reward['points']:,} Poin", cls="fw-bold fs-5 text-success"),
+                Span(f"{voucher.point_cost:,} Poin", cls="fw-bold fs-5 text-success"),
                 A("See Details", href="#", cls="btn-link text-decoration-none small", data_bs_toggle="modal", data_bs_target=f"#{modal_id}"),
                 cls="d-flex justify-content-between align-items-center mt-3"
             ),
-            Div(
-                A("Redeem Points", href="#", cls="btn btn-success w-100 fw-semibold mt-3"),
-                cls="mt-auto pt-3"
-            ),
+            Div(redeem_button, cls="mt-auto pt-3"),
             cls="card-body d-flex flex-column"
         ),
         cls="card h-100 shadow-sm reward-card"
     )
 
-def reward_content():
-    user_points = 5210
-    
+def reward_content(user: User, available_vouchers: list[Voucher], success_message: str | None = None):
     return Div(
         Div(
             H2("Sortify Reward Center", cls="text-center fw-bolder"),
             P("Exchange the points you have collected for various interesting prizes below.", cls="text-center text-muted fs-5"),
-            Div(
-                Span("Your Current Points:", cls="me-2"),
-                Span(f"{user_points:,}", cls="badge bg-success fs-5 rounded-pill"),
-                cls="d-flex justify-content-center align-items-center mt-4"
-            ),
+            redeem_alert(success_message, "success") if success_message else "",
+            user_points_display(user),
             cls="py-5"
         ),
         Div(
-            *[Div(reward_card(reward), cls="col-lg-3 col-md-4 col-sm-6 mb-4") for reward in rewards_data],
+            *[Div(reward_card(voucher, user.point), cls="col-lg-3 col-md-4 col-sm-6 mb-4") for voucher in available_vouchers] if available_vouchers else P("No rewards available at the moment. Check back later!", cls="text-center text-muted"),
             cls="row"
         ),
-        *[terms_and_conditions_modal(reward) for reward in rewards_data]
+        *[terms_and_conditions_modal(voucher) for voucher in available_vouchers],
     )
 
-def reward_section():
+def reward_section(user: User, available_vouchers: list[Voucher], success_message: str | None = None):
     return Div(
-        reward_content(),
+        reward_content(
+            user=user, 
+            available_vouchers=available_vouchers, 
+            success_message=success_message
+        ),
         ScrollTop(),
-        cls="container py-4"
+        cls="container py-4",
+        id="reward-section"
     )

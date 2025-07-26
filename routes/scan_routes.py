@@ -41,23 +41,12 @@ def scan_routes(rt):
         
         user_id = request.session.get("user_id")
         user = None
-        
+
         if user_id:
             db = get_db_session()
             try:
                 user = db.query(User).filter(User.id == user_id).first()
-                
-                if user:
-                    points_to_add = int(point) if point.isdigit() else 0
-                    if points_to_add > 0:
-                        if user.point is None:
-                            user.point = 0
-                        user.point += points_to_add
-                        db.commit()
-                        print(f"✅ Added {points_to_add} points to user {user.username}. Total: {user.point}")
-            except Exception as e:
-                print(f"❌ Error updating user points: {e}")
-                db.rollback()
+                print(f"Showing scan result only for user {user.username}.")
             finally:
                 db.close()
         
@@ -99,7 +88,7 @@ def scan_routes(rt):
                     print(f"⚠️ WasteDetectionLog with ID {dispose_id} not found.")
 
                 db.commit()
-                print(f"✅ User {user.username} points updated.")
+                print(f"User {user.username} points updated.")
 
             return JSONResponse({
                 "status": "ok",
@@ -111,7 +100,7 @@ def scan_routes(rt):
 
         except Exception as e:
             db.rollback()
-            print(f"❌ Error: {e}")
+            print(f"Error: {e}")
             return JSONResponse({"status": "error", "message": str(e)}, status_code=500)
         finally:
             db.close()
