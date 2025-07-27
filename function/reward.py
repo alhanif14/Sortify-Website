@@ -4,11 +4,7 @@ from database.models import User, Voucher
 from datetime import date
 
 def redeem_alert(message, alert_type="success"):
-    return Div(
-        message,
-        cls=f"alert alert-{alert_type} mt-4",
-        role="alert"
-    )
+    return Div(message, cls=f"alert alert-{alert_type} mt-4", role="alert")
 
 def user_points_display(user: User):
     return Div(
@@ -21,7 +17,6 @@ def user_points_display(user: User):
 def terms_and_conditions_modal(voucher: Voucher):
     modal_id = f"modal-{voucher.id}"
     terms_list = voucher.terms_conditions.split('\n') if voucher.terms_conditions else []
-    
     return Div(
         Div(
             Div(
@@ -40,37 +35,102 @@ def terms_and_conditions_modal(voucher: Voucher):
         , cls="modal-dialog modal-dialog-centered")
     , id=modal_id, cls="modal fade", tabindex="-1", aria_labelledby=f"{modal_id}-label", aria_hidden="true")
 
-def reward_card(voucher: Voucher, user_points: int):
-    modal_id = f"modal-{voucher.id}"
-    can_redeem = user_points >= voucher.point_cost
+def admin_reward_form(voucher: Voucher | None = None):
+    is_edit_mode = voucher is not None
+    def value(attr_name):
+        val = getattr(voucher, attr_name, '')
+        return str(val) if val is not None else ''
 
-    redeem_button = Button(
-        "Redeem Points",
-        hx_post=f"/redeem/{voucher.id}",
+    return Form(
+        Input(type="hidden", name="voucher_id", value=value('id')),
+        
+        Div(Label("Voucher Title", html_for="title", cls="form-label"),
+            Input(type="text", name="title", id="title", value=value('title'), required=True, cls="form-control"),
+            cls="mb-3"),
+
+        Div(Label("Description", html_for="description", cls="form-label"),
+            Textarea(value('description'), name="description", id="description", required=True, cls="form-control", rows="3"),
+            cls="mb-3"),
+
+        Div(Label("Point Cost", html_for="point_cost", cls="form-label"),
+            Input(type="number", name="point_cost", id="point_cost", value=value('point_cost'), required=True, cls="form-control"),
+            cls="mb-3"),
+
+        Div(
+            Div(Label("Start Date", html_for="start_date", cls="form-label"),
+                Input(type="date", name="start_date", id="start_date", value=value('start_date'), required=True, cls="form-control"),
+                cls="col"),
+            Div(Label("End Date", html_for="end_date", cls="form-label"),
+                Input(type="date", name="end_date", id="end_date", value=value('end_date'), required=True, cls="form-control"),
+                cls="col"),
+            cls="row mb-3"),
+
+        Div(Label("Terms & Conditions (one per line)", html_for="terms_conditions", cls="form-label"),
+            Textarea(value('terms_conditions'), name="terms_conditions", id="terms_conditions", cls="form-control", rows="4"),
+            cls="mb-3"),
+        
+        Button("Save Reward", type="submit", cls="btn btn-success w-100", data_bs_dismiss="modal"),
+
+        hx_post="/admin/voucher/save",
         hx_target="#reward-section",
-        hx_swap="outerHTML",
-        hx_confirm=f"Are you sure you want to redeem '{voucher.title}' for {voucher.point_cost} points?",
-        cls=f"btn {'btn-success' if can_redeem else 'btn-secondary'} w-100 fw-semibold mt-3",
-        disabled=not can_redeem,
-        title="Not enough points" if not can_redeem else "Redeem this voucher"
+        hx_swap="outerHTML"
     )
 
+def reward_card(voucher: Voucher, user_points: int, status: str, user: User | None = None):
+    start_date_str = voucher.start_date.strftime('%d %b %Y')
+    end_date_str = voucher.end_date.strftime('%d %b %Y')
+    
+    card_footer = None
+    if status == 'available':
+        can_redeem = user_points >= voucher.point_cost
+        card_footer = Div(
+            Button("Redeem Points", hx_post=f"/redeem/{voucher.id}", hx_target="#reward-section", hx_swap="outerHTML",
+                   hx_confirm=f"Redeem '{voucher.title}'?",
+                   cls=f"btn {'btn-success' if can_redeem else 'btn-secondary'} w-100 fw-semibold mt-3",
+                   disabled=not can_redeem, title="Not enough points" if not can_redeem else "Redeem this voucher"),
+            cls="mt-auto pt-3"
+        )
+    else:
+        badge_color = "bg-info-subtle text-info-emphasis" if status == 'coming_soon' else "bg-secondary-subtle"
+        card_footer = Div(
+            Span(voucher.status_text, cls=f"badge rounded-pill w-100 {badge_color} py-2 fs-6 fw-normal"),
+            cls="mt-auto pt-3"
+        )
+    
+    def is_admin(u):
+        return u and u.email == "sortify01@gmail.com"
+        
     return Div(
         Div(
-            H5(voucher.title, cls="card-title fw-bold"),
+            Div(
+                H5(voucher.title, cls="card-title fw-bold"),
+                A(I("edit", cls="material-symbols-rounded"),
+                  data_bs_toggle="modal", data_bs_target="#adminRewardModal",
+                  hx_get=f"/admin/voucher/form/{voucher.id}",
+                  hx_target="#adminModalContent",
+                  cls="btn btn-sm btn-outline-secondary ms-auto"
+                ) if is_admin(user) else ""
+            , cls="d-flex align-items-center"),
+            
             P(voucher.description, cls="card-text text-muted small"),
+            P(I("calendar_month", cls="material-symbols-rounded me-1", style="font-size: 1em; vertical-align: text-bottom;"),
+              f" {start_date_str} - {end_date_str}", cls="card-text text-muted small mt-2"),
             Div(
                 Span(f"{voucher.point_cost:,} Poin", cls="fw-bold fs-5 text-success"),
-                A("See Details", href="#", cls="btn-link text-decoration-none small", data_bs_toggle="modal", data_bs_target=f"#{modal_id}"),
+                A("See Details", href="#", cls="btn-link text-decoration-none small", data_bs_toggle="modal", data_bs_target=f"#modal-{voucher.id}"),
                 cls="d-flex justify-content-between align-items-center mt-3"
             ),
-            Div(redeem_button, cls="mt-auto pt-3"),
+            card_footer,
             cls="card-body d-flex flex-column"
         ),
         cls="card h-100 shadow-sm reward-card"
     )
 
-def reward_content(user: User, available_vouchers: list[Voucher], success_message: str | None = None):
+def reward_content(user, available_vouchers, coming_soon_vouchers, past_vouchers, success_message=None):
+    all_vouchers = available_vouchers + coming_soon_vouchers + past_vouchers
+    def is_admin(u):
+        return u and u.email == "sortify01@gmail.com"
+
     return Div(
         Div(
             H2("Sortify Reward Center", cls="text-center fw-bolder"),
@@ -80,18 +140,50 @@ def reward_content(user: User, available_vouchers: list[Voucher], success_messag
             cls="py-5"
         ),
         Div(
-            *[Div(reward_card(voucher, user.point), cls="col-lg-3 col-md-4 col-sm-6 mb-4") for voucher in available_vouchers] if available_vouchers else P("No rewards available at the moment. Check back later!", cls="text-center text-muted"),
-            cls="row"
+            H3("Available Rewards", cls="mb-3"),
+            Button(
+                I("add", cls="material-symbols-rounded"),
+                cls="btn btn-success ms-auto",
+                data_bs_toggle="modal", data_bs_target="#adminRewardModal",
+                hx_get="/admin/voucher/form",
+                hx_target="#adminModalContent"
+            ) if is_admin(user) else ""
+        , cls="d-flex align-items-center mb-3"),
+        
+        Div(
+            *[Div(reward_card(v, user.point, 'available', user), cls="col-lg-3 col-md-4 col-sm-6 mb-4") for v in available_vouchers]
+            if available_vouchers else P("No rewards available at the moment.", cls="text-muted"),
+            cls="row mb-5"
         ),
-        *[terms_and_conditions_modal(voucher) for voucher in available_vouchers],
+        
+        *[Div(
+            H3("Coming Soon", cls="mb-3 mt-5"),
+            Div(*[Div(reward_card(v, user.point, 'coming_soon', user), cls="col-lg-3 col-md-4 col-sm-6 mb-4") for v in coming_soon_vouchers], cls="row mb-5")
+        )] if coming_soon_vouchers else "",
+        
+        *[Div(
+            H3("Redeemed & Expired", cls="mb-3 mt-5"),
+            Div(*[Div(reward_card(v, user.point, 'past', user), cls="col-lg-3 col-md-4 col-sm-6 mb-4") for v in past_vouchers], cls="row mb-5")
+        )] if past_vouchers else "",
+
+        *[terms_and_conditions_modal(v) for v in all_vouchers],
     )
 
-def reward_section(user: User, available_vouchers: list[Voucher], success_message: str | None = None):
+def reward_section(user, available_vouchers, coming_soon_vouchers, past_vouchers, success_message=None):
     return Div(
+        Div(
+            Div(
+                Div(
+                    Div(
+                        H5("Manage Reward", cls="modal-title"),
+                        Button(type="button", cls="btn-close", data_bs_dismiss="modal", aria_label="Close")
+                    , cls="modal-header"),
+                    Div(cls="modal-body", id="adminModalContent")
+                , cls="modal-content")
+            , cls="modal-dialog modal-dialog-scrollable")
+        , cls="modal fade", id="adminRewardModal", tabindex="-1"),
         reward_content(
-            user=user, 
-            available_vouchers=available_vouchers, 
-            success_message=success_message
+            user, available_vouchers, coming_soon_vouchers, past_vouchers, success_message
         ),
         ScrollTop(),
         cls="container py-4",
