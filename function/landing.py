@@ -293,10 +293,10 @@ def leaderboard_card(leaders):
 
 def bin_availability_card():
     waste_types = [
-        {"name": "Paper", "percentage": "60%", "color": "warning"},
-        {"name": "Recycle", "percentage": "80%", "color": "primary"},
-        {"name": "Organic", "percentage": "90%", "color": "success"},
-        {"name": "Others", "percentage": "70%", "color": "secondary"},
+        {"id": "organic", "name": "Organic", "percentage": "0%", "color": "success"},
+        {"id": "recycle", "name": "Recycle", "percentage": "0%", "color": "primary"},
+        {"id": "paper", "name": "Paper", "percentage": "0%", "color": "warning"},
+        {"id": "others", "name": "Others", "percentage": "0%", "color": "secondary"},
     ]
 
     def legend_item(item):
@@ -306,7 +306,7 @@ def bin_availability_card():
                 Span(item["name"]),
                 cls="d-flex align-items-center"
             ),
-            Span(item["percentage"], cls="fw-medium"),
+            Span("0%", id=f"legend-{item['id']}", cls="fw-medium"),
             cls="d-flex justify-content-between align-items-center"
         )
 
@@ -315,14 +315,14 @@ def bin_availability_card():
         Div(
             Canvas(id="binAvailabilityChart"),
             Div(
-                H2("75%", cls="fw-bold"),
-                P("Overall Full", cls="text-muted small"),
+                H2("0%", id="overall-percentage", cls="fw-bold"),
+                P("Overall Empty", id="overall-status-text", cls="text-muted small"),
                 cls="position-absolute top-50 start-50 translate-middle text-center"
             ),
             cls="position-relative mx-auto",
             style="height: 14rem; width: 14rem;"
         ),
-        Div(*[legend_item(item) for item in waste_types], cls="vstack gap-2 mt-4"),
+        Div(*[legend_item(item) for item in waste_types], id="bin-legend-container", cls="vstack gap-2 mt-4"),
         cls="card-body"
     )
 
@@ -332,8 +332,7 @@ def charts_script(chart_labels, chart_data):
             if (typeof Chart === 'undefined') return;
 
             if (window.weeklyChart instanceof Chart) window.weeklyChart.destroy();
-            if (window.binChart instanceof Chart) window.binChart.destroy();
-
+            
             const weeklyDisposalCtx = document.getElementById('weeklyDisposalChart')?.getContext('2d');
             if (weeklyDisposalCtx) {{
                 const labels = {json.dumps(chart_labels)};
@@ -346,22 +345,8 @@ def charts_script(chart_labels, chart_data):
                 }});
             }}
 
-            const binAvailabilityCtx = document.getElementById('binAvailabilityChart')?.getContext('2d');
-            if (binAvailabilityCtx) {{
-                window.binChart = new Chart(binAvailabilityCtx, {{
-                    type: 'doughnut',
-                    data: {{
-                        labels: ['Paper', 'Recycle', 'Organic', 'Others'],
-                        datasets: [{{
-                            data: [60, 80, 90, 70],
-                            backgroundColor: ['#FFC107', '#0D6EFD', '#198754', '#6C757D'],
-                            borderColor: '#FFFFFF', borderWidth: 4, hoverOffset: 8
-                        }}]
-                    }},
-                    options: {{ responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: {{ legend: {{ display: false }}, tooltip: {{ enabled: false }} }} }}
-                }});
-            }}
         }}
+        
         initDashboardCharts();
     """)
 

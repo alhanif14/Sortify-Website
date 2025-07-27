@@ -64,7 +64,10 @@ def landing(request):
             Script(src="https://unpkg.com/jsqr/dist/jsQR.js", defer=True),
             Script(type="module", src="/static/js/scan.js"),
             Script(src="https://unpkg.com/htmx.org@1.9.12", defer=True),
-            Script(src="https://cdn.jsdelivr.net/npm/chart.js")
+            Script(src="https://cdn.jsdelivr.net/npm/chart.js"),
+            Script(src="/static/js/paho-mqtt.js", defer=True),
+            Script(type="module", src="/static/js/dashboard_mqtt.js"),
+
         ),
         Body(
         navbar(user),
