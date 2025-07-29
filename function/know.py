@@ -3,11 +3,11 @@ from function.component import ScrollTop
 
 knowledge_data = [
     {
-        "title": "Plastic Waste",
+        "title": "Recycle Waste",
         "image_src": "/static/knowledge/plastic.jpg",
-        "description": "Plastic waste is all used items made from plastic, such as bottles, packaging, and plastic bags. This material is very difficult to decompose and can last hundreds of years in the environment.",
-        "examples": "Water bottles, food wrappers, straws, plastic bags.",
-        "fun_fact": "Every minute, one million plastic bottles are bought around the world!",
+        "description": "Recycle waste includes all items that can be processed and reused, such as bottles, packaging, and bags made from plastic or other recyclable materials. Recycling helps reduce the amount of waste in the environment and conserves resources.",
+        "examples": "Water bottles, food wrappers, straws, plastic bags, cans, glass bottles.",
+        "fun_fact": "Every minute, one million plastic bottles are bought around the world! Recycling just one saves enough energy to power a light bulb for hours.",
         "theme_color": "primary"
     },
     {
