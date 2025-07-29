@@ -14,7 +14,7 @@ function detectQRCode(video) {
             video.srcObject.getTracks().forEach(track => track.stop());
             video.srcObject = null;
             currentStream = null;
-            console.log("Kamera dihentikan.");
+            console.log("camera stopped.");
         }
     }
 
@@ -80,14 +80,14 @@ function detectQRCode(video) {
                     })
                     .catch(err => {
                         console.error("Fetch error:", err);
-                        alert("Gagal mengirim data ke server: " + err.message);
+                        alert("Fetch failed: " + err.message);
                     });
 
                 return;
 
             } catch (e) {
                 console.error("QR parsing error:", e);
-                alert("QR tidak valid.");
+                alert("QR no valid.");
             }
         }
 
@@ -100,11 +100,11 @@ function detectQRCode(video) {
 function startCameraAndDetect() {
     const video = document.getElementById("camera");
     if (!video) {
-        console.log("Elemen video dengan id 'camera' tidak ditemukan.");
+        console.log("Video element not found.");
         return;
     }
 
-    console.log("Memulai kamera...");
+    console.log("Starting camera...");
 
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
         .then((stream) => {
@@ -113,13 +113,13 @@ function startCameraAndDetect() {
 
             video.addEventListener("loadedmetadata", () => {
                 video.play();
-                console.log("Kamera aktif, mulai deteksi QR...");
+                console.log("Camera is active, starting QR detection...");
                 detectQRCode(video);
             });
         })
         .catch((err) => {
-            console.error("Gagal membuka kamera:", err);
-            alert("Tidak dapat mengakses kamera. Periksa izin browser dan pastikan menggunakan HTTPS.");
+            console.error("Failed to open camera:", err);
+            alert("Cannot access camera. Check browser permissions and ensure HTTPS is used.");
         });
 }
 
@@ -127,7 +127,7 @@ document.body.addEventListener("htmx:afterSwap", function (evt) {
     console.log("HTMX swap complete. Checking for #camera...");
     const video = document.getElementById("camera");
     if (video) {
-        console.log("Kamera ditemukan, mulai deteksi QR...");
+        console.log("Camera found, starting QR detection...");
         startCameraAndDetect();
     }
 });
@@ -136,6 +136,6 @@ document.body.addEventListener("htmx:beforeSwap", function (evt) {
     if (currentStream) {
         currentStream.getTracks().forEach(track => track.stop());
         currentStream = null;
-        console.log("Kamera dimatikan sebelum ganti halaman.");
+        console.log("Camera stopped before page change.");
     }
 });

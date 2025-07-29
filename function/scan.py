@@ -65,7 +65,7 @@ def get_waste_image(waste_type):
 
 def get_point_per_waste(waste_type):
     return {
-        "plastic": 40,
+        "recycle": 40,
         "paper": 40,
         "organic": 30,
         "other": 10,
@@ -74,16 +74,12 @@ def get_point_per_waste(waste_type):
 def scan_result_content(waste_types=None, point=None, timestamp=None, dispose_id=None, user=None):
     waste_types = waste_types.split(",") if waste_types else []
     
-    # ✅ Use timestamp from QR code, fallback to current time
     if timestamp:
         try:
-            # Parse timestamp if it's a string (ISO format or epoch)
             if isinstance(timestamp, str):
                 if timestamp.isdigit():
-                    # Epoch timestamp
                     date_obj = datetime.fromtimestamp(int(timestamp))
                 else:
-                    # ISO format
                     date_obj = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
             else:
                 date_obj = datetime.fromtimestamp(timestamp)
@@ -94,7 +90,6 @@ def scan_result_content(waste_types=None, point=None, timestamp=None, dispose_id
     else:
         formatted_date = datetime.now().strftime("%d %b %Y")
     
-    # ✅ Use dispose_id from QR code, fallback to generated ID
     order_id = f"#{dispose_id}"
     
     username = user.username if user else "User"
