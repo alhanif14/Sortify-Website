@@ -22,7 +22,7 @@ def navbar(user=None):
     if user:
         right_section = Div(
             Span(f"Hi, {user.username}", cls="navbar-text me-3 fw-bold"),
-            Button("Logout", hx_post="/logout", hx_trigger="click", cls="btn btn-outline-danger btn-sm"),
+            Button("Logout", hx_post="/logout", hx_trigger="click", hx_confirm="Are you sure you want to logout?", cls="btn btn-outline-danger btn-sm"),
             cls="d-flex align-items-center"
         )
     else:

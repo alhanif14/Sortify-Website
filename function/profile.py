@@ -27,11 +27,12 @@ def profile_content(user):
                 _class="profile-badge"
             ),
             Div(
-                Button("Edit Profile", _class="btn-edit"),
+                # Button("Edit Profile", _class="btn-edit"),
                 Button("Logout", 
                        _class="btn-logout",
                        hx_post="/logout",
-                       hx_target="#mainContent"),
+                       hx_target="#mainContent",
+                       hx_confirm="Are you sure you want to logout?"),
                 _class="profile-actions"
             ),
             _class="profile-card"

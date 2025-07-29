@@ -1,5 +1,5 @@
 if (typeof Chart === 'undefined') {
-    console.error("Chart.js belum dimuat. Pastikan skrip Chart.js dimuat sebelum file ini.");
+    console.error("Chart.js not loaded yet.");
 } else {
     const binData = {
         organic: 0,
@@ -82,7 +82,7 @@ if (typeof Chart === 'undefined') {
         if (window.mqttClient && window.mqttClient.isConnected()) return;
 
         waitForPaho(() => {
-            const client = new Paho.Client("broker.emqx.io", 8083, "/mqtt", "dashboard_client_" + Math.random());
+            const client = new Paho.Client("broker.emqx.io", 8084, "/mqtt", "dashboard_client_" + Math.random());
             window.mqttClient = client;
 
             const topicMap = {
@@ -105,6 +105,7 @@ if (typeof Chart === 'undefined') {
             };
 
             client.connect({
+                useSSL: true,
                 onSuccess: () => {
                     console.log("MQTT Dashboard Connected!");
                     Object.keys(topicMap).forEach(topic => client.subscribe(topic));
