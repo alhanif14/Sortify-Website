@@ -30,15 +30,19 @@ def landing_hero():
     )
 
 def landing_stats(user_count, waste_count, redeemed_count):
+    user_display = f"{user_count:,}"
+    waste_display = f"{waste_count:,}"
+    redeemed_display = f"{redeemed_count:,}"
+    
     stats_data = [
-        {"id": "stat-users", "value": user_count, "label": "Active Users"},
-        {"id": "stat-waste", "value": waste_count, "label": "Sorted Waste Items"},
-        {"id": "stat-redeemed", "value": redeemed_count, "label": "Rewards Redeemed"}
+        {"id": "stat-users", "value": user_display, "label": "Active Users"},
+        {"id": "stat-waste", "value": waste_display, "label": "Sorted Waste Items"},
+        {"id": "stat-redeemed", "value": redeemed_display, "label": "Rewards Redeemed"}
     ]
     
     def stat_item(data):
         return Div(
-            Div(0, id=data["id"], data_value=data["value"], data_suffix=data.get("suffix", ""), cls="display-4 fw-bold text-success"),
+            Div(data["value"], id=data["id"], cls="display-4 fw-bold text-success"),
             Div(data["label"], cls="text-muted"),
             cls="text-center"
         )
