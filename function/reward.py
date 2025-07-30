@@ -189,3 +189,30 @@ def reward_section(user, available_vouchers, coming_soon_vouchers, past_vouchers
         cls="container py-4",
         id="reward-section"
     )
+
+def reward_unauthenticated_content():
+    return Div(
+        Div(
+            I("redeem", cls="material-symbols-rounded", style="font-size: 100px; color: #198754;"),
+            cls="text-center my-4"
+        ),
+        Div(
+            H3("Rewards Await!", cls="scan1-title"),
+            P("See the exciting rewards you can get by sorting waste.", cls="scan1-desc"),
+            P("💡 Log in first to see available rewards and track your points.", cls="scan1-warning"),
+            A("Login / Register", 
+              href="/login",
+              hx_get="/login",
+              hx_target="#mainContent", 
+              cls="btn btn-success px-4 py-2 mt-3 mb-5"),
+            cls="text-center px-3"
+        ),
+        cls="container-fluids d-flex flex-column align-items-center justify-content-center"
+    )
+
+def reward_unauthenticated_section():
+    return Div(
+        reward_unauthenticated_content(),
+        ScrollTop(),
+        cls="scan1-page my-5 px-5"
+    )

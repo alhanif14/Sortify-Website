@@ -1,5 +1,5 @@
 from fasthtml.common import *
-from function.reward import reward_section, admin_reward_form
+from function.reward import reward_section, admin_reward_form, reward_unauthenticated_section
 from database.database import get_current_user, get_db_session
 from database.models import Voucher, UserVoucherRedeem, User
 from starlette.requests import Request
@@ -33,7 +33,7 @@ def reward_routes(rt):
     def get_reward_page(request: Request):
         user = get_current_user(request)
         if not user:
-            return HTMLResponse("You must be logged in to access this page.", status_code=401)
+            return reward_unauthenticated_section()
 
         db: Session = get_db_session()
         try:
