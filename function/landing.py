@@ -159,27 +159,29 @@ def landing_cta():
         cls="py-5"
     )
 
+def stats_script(user_count, waste_count, redeemed_count):
+    return Script(f"""
+        // Kita tunggu sebentar (misal 50ms) untuk memastikan semua sudah siap
+        setTimeout(() => {{
+            if (typeof CountUp !== 'undefined') {{
+                new CountUp('stat-users', {user_count}, {{ suffix: '+' }}).start();
+                new CountUp('stat-waste', {waste_count}).start();
+                new CountUp('stat-redeemed', {redeemed_count}, {{ suffix: '+' }}).start();
+                console.log('CountUp animations started!');
+            }} else {{
+                console.error('CountUp library not found!');
+            }}
+        }}, 50);
+    """)
+
 def landing_section(user=None):
     db = get_db_session()
-    
-    print("Attempting to fetch landing page stats...")
     try:
         user_count = db.query(User).count()
-        print(f"  -> User count from DB: {user_count}")
-
         waste_count = db.query(WasteDetectionLog).count()
-        print(f"  -> Waste count from DB: {waste_count}")
-
         redeemed_count = db.query(UserVoucherRedeem).count()
-        print(f"  -> Redeemed count from DB: {redeemed_count}")
-        
-    except Exception as e:
-        print(f"!!! DATABASE ERROR while fetching stats: {e}")
     finally:
-        print("Closing DB session for stats.")
         db.close()
-    
-    print(f"Final stats being sent to component: Users={user_count}, Waste={waste_count}, Redeemed={redeemed_count}")
     return Div(
         ScrollTop(),
         landing_hero(),
@@ -189,6 +191,7 @@ def landing_section(user=None):
         landing_testimonials(),
         landing_cta() if user is None else None,
         ScrollTop(),
+        stats_script(user_count, waste_count, redeemed_count),
         cls="landing-page"
     )
 
