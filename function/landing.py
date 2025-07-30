@@ -159,20 +159,6 @@ def landing_cta():
         cls="py-5"
     )
 
-def stats_script(user_count, waste_count, redeemed_count):
-    return Script(f"""
-        document.addEventListener('DOMContentLoaded', () => {{
-            if (typeof CountUp !== 'undefined') {{
-                new CountUp('stat-users', {user_count}, {{ suffix: ' +' }}).start();
-                new CountUp('stat-waste', {waste_count}).start();
-                new CountUp('stat-redeemed', {redeemed_count}, {{ suffix: ' +' }}).start();
-                console.log('CountUp animations started via DOMContentLoaded!');
-            }} else {{
-                console.error('CountUp library still not found!');
-            }}
-        }});
-    """)
-
 def landing_section(user=None):
     db = get_db_session()
     try:
@@ -190,7 +176,6 @@ def landing_section(user=None):
         landing_testimonials(),
         landing_cta() if user is None else None,
         ScrollTop(),
-        stats_script(user_count, waste_count, redeemed_count),
         cls="landing-page"
     )
 

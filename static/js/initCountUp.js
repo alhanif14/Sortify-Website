@@ -1,11 +1,16 @@
 import { CountUp } from './countUp.min.js';
-
 function runAllCountUps() {
-    if (typeof CountUp === 'undefined') return;
+    if (typeof CountUp === 'undefined') {
+        console.error('CountUp.js library is not loaded when runAllCountUps is called.');
+        return;
+    }
 
     const counters = document.querySelectorAll('[data-value]');
+    
     counters.forEach(counter => {
-        if (counter.countUp) counter.countUp.reset();
+        if (counter.countUp) {
+            counter.countUp.reset();
+        }
 
         const endVal = parseFloat(counter.getAttribute('data-value'));
         const suffix = counter.getAttribute('data-suffix') || '';
@@ -17,6 +22,7 @@ function runAllCountUps() {
         };
 
         const countUp = new CountUp(counter.id, endVal, options);
+        
         if (!countUp.error) {
             countUp.start();
             counter.countUp = countUp;
@@ -27,4 +33,9 @@ function runAllCountUps() {
 }
 
 document.addEventListener('DOMContentLoaded', runAllCountUps);
-document.body.addEventListener('htmx:afterSwap', runAllCountUps);
+
+document.body.addEventListener('htmx:afterSwap', (event) => {
+    if (event.detail.target.id === 'mainContent') {
+        runAllCountUps();
+    }
+});

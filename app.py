@@ -10,7 +10,6 @@ from routes.profile_routes import profile_routes
 from routes.auth_routes import auth_routes
 from starlette.middleware.sessions import SessionMiddleware
 from database.database import get_current_user, Base, engine
-from starlette.staticfiles import StaticFiles 
 from database import models
 from starlette.responses import RedirectResponse
 import uvicorn
@@ -18,8 +17,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app, rt = fast_app(live=True, pico=False)
-
-app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY"))
 
