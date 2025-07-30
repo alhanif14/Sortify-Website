@@ -161,7 +161,6 @@ def landing_cta():
 
 def stats_script(user_count, waste_count, redeemed_count):
     return Script(f"""
-        // Kita tunggu sebentar (misal 50ms) untuk memastikan semua sudah siap
         setTimeout(() => {{
             if (typeof CountUp !== 'undefined') {{
                 new CountUp('stat-users', {user_count}, {{ suffix: '+' }}).start();
