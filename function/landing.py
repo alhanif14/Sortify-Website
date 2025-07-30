@@ -161,16 +161,16 @@ def landing_cta():
 
 def stats_script(user_count, waste_count, redeemed_count):
     return Script(f"""
-        setTimeout(() => {{
+        document.addEventListener('DOMContentLoaded', () => {{
             if (typeof CountUp !== 'undefined') {{
-                new CountUp('stat-users', {user_count}, {{ suffix: '+' }}).start();
+                new CountUp('stat-users', {user_count}, {{ suffix: ' +' }}).start();
                 new CountUp('stat-waste', {waste_count}).start();
-                new CountUp('stat-redeemed', {redeemed_count}, {{ suffix: '+' }}).start();
-                console.log('CountUp animations started!');
+                new CountUp('stat-redeemed', {redeemed_count}, {{ suffix: ' +' }}).start();
+                console.log('CountUp animations started via DOMContentLoaded!');
             }} else {{
-                console.error('CountUp library not found!');
+                console.error('CountUp library still not found!');
             }}
-        }}, 50);
+        }});
     """)
 
 def landing_section(user=None):
