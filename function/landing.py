@@ -1,7 +1,7 @@
 from fasthtml.common import *
 from function.component import ScrollTop
 from database.database import get_db_session
-from database.models import User, WasteDetectionLog
+from database.models import User, WasteDetectionLog, UserVoucherRedeem
 from sqlalchemy import desc
 from datetime import datetime, timedelta
 import json
@@ -29,24 +29,23 @@ def landing_hero():
         cls="container px-5 py-5"
     )
 
-def landing_stats():
+def landing_stats(user_count, waste_count, redeemed_count):
     stats_data = [
-        {"id": "stat-users", "value": "12,000+", "label": "Active Users"},
-        {"id": "stat-sorted-waste", "value": "5 Tons", "label": "Sorted Waste"},
-        {"id": "stat-rewards", "value": "100+", "label": "Rewards Redeemed"},
-        {"id": "stat-joined-communities", "value": "45", "label": "Joined Communities"}
+        {"id": "stat-users", "value": user_count, "label": "Active Users"},
+        {"id": "stat-waste", "value": waste_count, "label": "Sorted Waste Items"},
+        {"id": "stat-redeemed", "value": redeemed_count, "label": "Rewards Redeemed"}
     ]
     
     def stat_item(data):
         return Div(
-            Div(data["value"], id=data["id"], cls="display-4 fw-bold text-success"),
+            Div(0, id=data["id"], data_value=data["value"], data_suffix=data.get("suffix", ""), cls="display-4 fw-bold text-success"),
             Div(data["label"], cls="text-muted"),
             cls="text-center"
         )
 
     return Div(
         Div(
-            Div(*[Div(stat_item(s), cls="col") for s in stats_data], cls="row row-cols-2 row-cols-lg-4 g-4"),
+            Div(*[Div(stat_item(s), cls="col") for s in stats_data], cls="row row-cols-2 row-cols-lg-3 g-3"),
             cls="container px-5"
         ),
         cls="py-5 bg-success bg-opacity-10"
@@ -57,19 +56,16 @@ def landing_features():
         {
             "title": "Smart & Fast Scanning",
             "desc": "No more confusion. Just dispose your waste at sortify, and our system will instantly recognize its type and dispose it with proper sorting.",
-            "img_src": "/static/landing/feature-scan.png"
         },
         {
             "title": "Point & Rewards System",
             "desc": "Every time you sort your waste correctly, you earn points. Collect as many points as possible and exchange them for vouchers, donations, or exclusive merchandise.",
-            "img_src": "/static/landing/feature-reward.png"
         }
     ]
     
     def feature_item(data, reverse=False):
-        img_col = Div(Img(src=data["img_src"], cls="img-fluid rounded-3"), cls="col-md-5")
         text_col = Div(
-            H2(data["title"], cls="fw-bolder"),
+            H2(data["title"], cls="fw-bolder text-success"),
             P(data["desc"], cls="lead text-muted"),
             cls="col-md-7"
         )
@@ -79,7 +75,6 @@ def landing_features():
         
         return Div(
             Div(
-                Div(img_col, cls=f"{order_img}"),
                 Div(text_col, cls=f"{order_text}"),
                 cls="row gx-5 align-items-center"
             ),
@@ -165,10 +160,17 @@ def landing_cta():
     )
 
 def landing_section(user=None):
+    db = get_db_session()
+    try:
+        user_count = db.query(User).count()
+        waste_count = db.query(WasteDetectionLog).count()
+        redeemed_count = db.query(UserVoucherRedeem).count()
+    finally:
+        db.close()
     return Div(
         ScrollTop(),
         landing_hero(),
-        landing_stats(),
+        landing_stats(user_count, waste_count, redeemed_count),
         landing_features(),
         landing_process(),
         landing_testimonials(),

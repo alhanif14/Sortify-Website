@@ -109,9 +109,9 @@ def scan_result_content(waste_types=None, point=None, timestamp=None, dispose_id
                         P(w.capitalize(), cls="waste-name"),
                         cls="waste-left"
                     ),
-                    P(f"+{get_point_per_waste(w)} pts", cls="waste-point"),
+                    P(f"+{get_point_per_waste(w)} pts", cls="waste-point ms-auto"),
                     Hr(),
-                    cls="waste-row"
+                    cls="waste-row d-flex align-items-center"
                 ) for i, w in enumerate(waste_types)
             ],
             Div(
@@ -120,7 +120,7 @@ def scan_result_content(waste_types=None, point=None, timestamp=None, dispose_id
                 cls="receipt-total-row"
             ),
             P(f"Dispose id: {order_id}", cls="receipt-order"),
-            A("Check your point!", href="/profile", hx_get="/profile", hx_target="#mainContent", cls="btn btn-primary mt-3"),
+            A("Check your point!", href="/profile", hx_get="/profile", hx_target="#mainContent", cls="btn btn-success mt-3"),
             cls="receipt-box"
         ),
         cls="receipt-page d-flex justify-content-center align-items-center"

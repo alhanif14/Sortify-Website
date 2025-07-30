@@ -1,37 +1,30 @@
-import { CountUp } from "./countUp.min.js";
+import { CountUp } from './countUp.min.js';
 
-document.addEventListener("DOMContentLoaded", function () {
-    /**
-     * @param {string} id
-     * @param {number} endVal
-     * @param {object} options
-     */
-    function startCountUp(id, endVal, options = {}) {
-        // Opsi default untuk semua hitungan
-        const defaultOptions = {
-            duration: 3.0,
+function runAllCountUps() {
+    if (typeof CountUp === 'undefined') return;
+
+    const counters = document.querySelectorAll('[data-value]');
+    counters.forEach(counter => {
+        if (counter.countUp) counter.countUp.reset();
+
+        const endVal = parseFloat(counter.getAttribute('data-value'));
+        const suffix = counter.getAttribute('data-suffix') || '';
+        const options = {
+            duration: 2.5,
             separator: ".",
+            suffix: ` ${suffix}`,
             useEasing: true,
         };
 
-        const finalOptions = { ...defaultOptions, ...options };
-        
-        const element = document.getElementById(id);
-        if (!element) {
-            return;
-        }
-
-        const countUp = new CountUp(id, endVal, finalOptions);
-
+        const countUp = new CountUp(counter.id, endVal, options);
         if (!countUp.error) {
             countUp.start();
+            counter.countUp = countUp;
         } else {
-            console.error(`CountUp.js error on #${id}:`, countUp.error);
+            console.error(`CountUp.js error on #${counter.id}:`, countUp.error);
         }
-    }
+    });
+}
 
-    startCountUp("stat-pengguna", 12000, { suffix: "+" });
-    startCountUp("stat-sampah", 5, { suffix: " Ton" });
-    startCountUp("stat-hadiah", 100, { suffix: "+" });
-    startCountUp("stat-komunitas", 45);
-});
+document.addEventListener('DOMContentLoaded', runAllCountUps);
+document.body.addEventListener('htmx:afterSwap', runAllCountUps);

@@ -13,7 +13,6 @@ def scan_routes(rt):
 
     @rt("/scan")
     def scan(request: Request):
-        # Check if user is logged in
         user_id = request.session.get("user_id")
         
         if not user_id:
