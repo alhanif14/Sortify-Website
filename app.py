@@ -58,7 +58,7 @@ def landing(request):
             Link(href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css", rel="stylesheet"),
             Script(src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"),
             Link(href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded", rel="stylesheet"),
-            Script(type="module", src="/static/js/countUp.min.js"),
+            Script(type="module", src="https://cdnjs.cloudflare.com/ajax/libs/countup.js/2.0.5/countUp.min.js"),
             Script(type="module", src="/static/js/initCountUp.js"),
             Script(type="module", src="/static/js/script.js"),
             Script(src="https://unpkg.com/jsqr/dist/jsQR.js", defer=True),

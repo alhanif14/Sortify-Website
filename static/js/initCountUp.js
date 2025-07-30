@@ -4,7 +4,7 @@ function runCounters() {
     if (typeof CountUp === 'undefined') return;
 
     const counters = document.querySelectorAll('[data-value]');
-    counters.forEach(counter => {
+    counters.forEach(counter => {   
         if (counter.hasAttribute('data-animated')) return;
 
         const endVal = parseFloat(counter.getAttribute('data-value'));
