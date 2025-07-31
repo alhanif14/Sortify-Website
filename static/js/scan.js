@@ -83,7 +83,7 @@ function detectQRCode(video) {
         }
         else {
             console.error("Error from /process_scan:", data.message);
-            alert("Gagal proses scan: " + data.message);
+            alert("Process scan failed: " + data.message);
         }
     })
     .catch(err => {
