@@ -184,13 +184,7 @@ def landing_section(user=None):
     )
 
 def dashboard_header():
-    return Div(
-        Div(
-            H1("Dashboard", cls="fw-bold mb-1"),
-            P("Welcome back, here's your waste management overview.", cls="text-muted")
-        ),
-        cls="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4"
-    )
+    return Div(Div(H1("Dashboard", cls="fw-bold mb-1"), P("Welcome back, here's your waste management overview.", cls="text-muted")), cls="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4")
 
 def time_ago(ts):
     try:
@@ -217,47 +211,74 @@ def get_color(waste_type):
     }
     return mapping.get(waste_type.capitalize(), "secondary")
 
-def disposal_logs_card(logs):
+def disposal_logs_card():
+    return Div(
+        Div(id="logs-card-content",
+            hx_get="/dashboard/logs-table", hx_trigger="load",
+            _=[P("Loading logs...", cls="text-center text-muted p-5")]
+        ),
+        cls="card-body"
+    )
+
+def disposal_logs_card_content(logs, page, total_pages, search, sort_by, order):
     def log_row(log):
         username = log.username or "Unknown"
         initials = "".join([name[0] for name in username.split()[:2]]).upper()
         badge_class = f"badge text-bg-{get_color(log.waste_type)}"
         return Tr(
             Td(f"#{log.id}", cls="align-middle small text-muted"),
-            Td(
-                Div(
-                    Img(src=f"https://placehold.co/32x32/E2E8F0/475569?text={initials}", alt=username, cls="rounded-circle me-3"),
-                    Span(username, cls="fw-medium"),
-                    cls="d-flex align-items-center"
-                ),
-                cls="align-middle"
-            ),
+            Td(Div(Img(src=f"https://placehold.co/32x32/E2E8F0/475569?text={initials}", alt=username, cls="rounded-circle me-3"), Span(username, cls="fw-medium")), cls="align-middle"),
             Td(Span(log.waste_type.capitalize(), cls=badge_class), cls="align-middle"),
             Td(time_ago(log.timestamp), cls="align-middle small text-muted"),
         )
-
-    return Div(
+    def sortable_th(label, column_name):
+        is_active = sort_by == column_name
+        next_order = "asc" if is_active and order == "desc" else "desc"
+        icon = I("unfold_more", cls="material-symbols-rounded align-middle small text-muted")
+        if is_active:
+            icon_name = "arrow_downward" if order == "desc" else "arrow_upward"
+            icon = I(icon_name, cls="material-symbols-rounded align-middle")
+        return Th(A(label, " ", icon, href="#", hx_get=f"/dashboard/logs-table?sort_by={column_name}&order={next_order}&search={search}", hx_target="#logs-card-content", cls="text-decoration-none text-dark"))
+    
+    return Form(
         Div(
             H5("Disposal Logs", cls="card-title fw-bold"),
-            A("View All", href="#", cls="btn-link text-decoration-none"),
+            Input(type="search", name="search", value=search, 
+                  placeholder="Search...", cls="form-control form-control-sm ms-auto", 
+                  style="max-width: 250px;"),
             cls="d-flex justify-content-between align-items-center mb-3"
         ),
         Div(
             Table(
-                Thead(
-                    Tr(
-                        Th("Dispose ID", scope="col"),
-                        Th("User", scope="col"),
-                        Th("Waste Type", scope="col"),
-                        Th("Time", scope="col"),
-                    )
-                ),
+                Thead(Tr(
+                    sortable_th("Dispose ID", "id"), 
+                    sortable_th("User", "username"),
+                    sortable_th("Waste Type", "waste_type"), 
+                    sortable_th("Time", "timestamp")
+                )),
                 Tbody(*[log_row(log) for log in logs]),
-                cls="table table-borderless table-hover"
+                cls="table table-hover"
             ),
             cls="table-responsive"
         ),
-        cls="card-body"
+        Nav(
+            Ul(
+                *[Li(
+                    A(str(p), href="#",
+                      hx_get=f"/dashboard/logs-table?page={p}&sort_by={sort_by}&order={order}&search={search}",
+                      hx_target="#logs-card-content",
+                      cls=f"page-link {'active' if p == page else ''}"),
+                    cls="page-item"
+                ) for p in range(1, total_pages + 1)],
+                cls="pagination pagination-sm justify-content-end mt-3"
+            )
+        ) if total_pages > 1 else "",
+        
+        id="logs-card-content",
+        hx_get="/dashboard/logs-table",
+        hx_trigger="submit, search",
+        hx_target="#logs-card-content",
+        hx_swap="innerHTML"
     )
 
 def weekly_disposal_card():
@@ -274,27 +295,53 @@ def weekly_disposal_card():
 def leaderboard_card(leaders):
     def leader_item(leader, rank):
         initials = "".join([name[0] for name in leader.username.split()[:2]]).upper()
-        return Div(
-            Div(
-                Img(src=f"https://placehold.co/40x40/E2E8F0/475569?text={initials}", alt=leader.username, cls="rounded-circle me-3"),
-                Div(
-                    P(leader.username, cls="fw-semibold mb-0"),
-                    P(f"Rank {rank}", cls="small text-muted mb-0")
-                ),
-                cls="d-flex align-items-center"
-            ),
-            Span(f"{leader.point:,} pts", cls="fw-bold text-success"),
-            cls="d-flex align-items-center justify-content-between"
-        )
-
+        return Div(Div(Img(src=f"https://placehold.co/40x40/E2E8F0/475569?text={initials}", alt=leader.username, cls="rounded-circle me-3"), Div(P(leader.username, cls="fw-semibold mb-0"), P(f"Rank {rank}", cls="small text-muted mb-0")), cls="d-flex align-items-center"), Span(f"{leader.point:,} pts", cls="fw-bold text-success"), cls="d-flex align-items-center justify-content-between")
     return Div(
         Div(
             H5("Leaderboard", cls="card-title fw-bold"),
-            A("See All", href="#", cls="btn-link text-decoration-none"),
+            A("See All", href="#", cls="btn-link text-decoration-none",
+              data_bs_toggle="modal", data_bs_target="#leaderboardModal",
+              hx_get="/dashboard/leaderboard-all",
+              hx_target="#leaderboardModalContent"),
             cls="d-flex justify-content-between align-items-center mb-3"
         ),
         Div(*[leader_item(leader, i + 1) for i, leader in enumerate(leaders)], cls="vstack gap-3"),
         cls="card-body"
+    )
+
+def full_leaderboard_modal():
+    return Div(
+        Div(
+            Div(
+                Div(
+                    H5("Full Leaderboard", cls="modal-title"),
+                    Button(type="button", cls="btn-close", data_bs_dismiss="modal")
+                , cls="modal-header"),
+                Div(cls="modal-body p-0", id="leaderboardModalContent")
+            , cls="modal-content")
+        , cls="modal-dialog modal-dialog-scrollable modal-lg")
+    , cls="modal fade", id="leaderboardModal", tabindex="-1"
+    )
+
+def full_leaderboard_modal_content(users):
+    def user_row(user, rank):
+        initials = "".join([name[0] for name in user.username.split()[:2]]).upper()
+        return Tr(
+            Td(f"#{rank}", cls="align-middle fw-bold text-center"),
+            Td(
+                Div(
+                    Img(src=f"https://placehold.co/32x32/E2E8F0/475569?text={initials}", alt=user.username, cls="rounded-circle me-3"),
+                    Span(user.username, cls="fw-medium"),
+                    cls="d-flex align-items-center"
+                )
+            ),
+            Td(user.email, cls="align-middle text-muted small"),
+            Td(f"{user.point:,} pts", cls="align-middle text-end fw-semibold text-success")
+        )
+    return Table(
+        Thead(Tr(Th("Rank", cls="text-center"), Th("User"), Th("Email"), Th("Points", cls="text-end"))),
+        Tbody(*[user_row(u, i + 1) for i, u in enumerate(users)]),
+        cls="table table-striped mb-0"
     )
 
 def bin_availability_card():
@@ -356,61 +403,44 @@ def charts_script(chart_labels, chart_data):
         initDashboardCharts();
     """)
 
+# function/landing.py
+
 def dashboard_section():
     db = get_db_session()
     try:
         top_leaders = db.query(User).order_by(desc(User.point)).limit(5).all()
-
+        
         today = datetime.now()
         seven_days_ago = today - timedelta(days=7)
-        daily_counts = {(today - timedelta(days=i)).strftime('%a'): 0 for i in range(7)}
+        logs_for_chart = db.query(WasteDetectionLog.timestamp).filter(WasteDetectionLog.timestamp >= seven_days_ago).all()
+        
         day_labels = [(today - timedelta(days=i)).strftime('%a') for i in range(6, -1, -1)]
+        daily_counts = {day: 0 for day in day_labels}
 
-        logs = db.query(WasteDetectionLog).all()
-        recent_logs = db.query(WasteDetectionLog).order_by(desc(WasteDetectionLog.timestamp)).limit(5).all()
-
-        for log in logs:
-            ts = log.timestamp
-            if isinstance(ts, str):
-                try:
-                    ts = datetime.fromisoformat(ts)
-                except ValueError:
-                    continue
-
-            if ts >= seven_days_ago:
-                day_name = ts.strftime('%a')
-                if day_name in daily_counts:
-                    daily_counts[day_name] += 1
-
-            try:
-                ts = datetime.fromisoformat(log.timestamp)
-            except:
-                continue
-            if ts >= seven_days_ago:
-                day_name = ts.strftime('%a')
-                if day_name in daily_counts:
-                    daily_counts[day_name] += 1
-
+        for log_ts, in logs_for_chart:
+            day_name = log_ts.strftime('%a')
+            if day_name in daily_counts: daily_counts[day_name] += 1
+        
         final_chart_data = [daily_counts[day] for day in day_labels]
-
     finally:
         db.close()
 
     return Div(
+        full_leaderboard_modal(),
         ScrollTop(),
         dashboard_header(),
         Div(
             Div(
-                Div(weekly_disposal_card(), cls="card shadow-sm mb-4"),
-                Div(disposal_logs_card(recent_logs), cls="card shadow-sm"),
-                cls="col-lg-8"
+                Div(Div(weekly_disposal_card(), cls="card shadow-sm h-100"), cls="col-lg-8"),
+                Div(Div(bin_availability_card(), cls="card shadow-sm h-100"), cls="col-lg-4"),
+                cls="row g-4 mb-4"
             ),
             Div(
-                Div(bin_availability_card(), cls="card shadow-sm mb-4"),
-                Div(leaderboard_card(top_leaders), cls="card shadow-sm"),
-                cls="col-lg-4"
+                Div(Div(disposal_logs_card(), cls="card shadow-sm h-100"), cls="col-lg-8"),
+                Div(Div(leaderboard_card(top_leaders), cls="card shadow-sm h-100"), cls="col-lg-4"),
+                cls="row g-4"
             ),
-            cls="row g-4"
+            
         ),
         charts_script(day_labels, final_chart_data),
         cls="container-fluid p-4"
