@@ -42,7 +42,19 @@ def scan_content():
 def scan_section():
     return Div(scan_content())
 
-# ✅ Add logged in scan content with user info
+def scan_used_content(claimed_by: str):
+    return Div(
+        Div(
+            Span("lock_person", cls="material-symbols-rounded text-warning", style="font-size: 8rem;"),
+            H2("QR Code Already Claimed", cls="receipt-hello mt-3"),
+            P(f"This QR code has already been claimed by ", Span(claimed_by, cls="fw-bold"), ".", cls="receipt-msg"),
+            Hr(),
+            A("Scan Another QR", href="/scan", hx_get="/scan", hx_target="#mainContent", cls="btn btn-secondary mt-3"),
+            cls="receipt-box text-center"
+        ),
+        cls="receipt-page d-flex justify-content-center align-items-center"
+    )
+
 def scan_logged_content(user):
     return Div(
         Div(

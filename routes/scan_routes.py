@@ -1,5 +1,5 @@
 from fasthtml.common import *
-from function.scan import scan_section, scan_result_section, scan1_section, scan_logged_section
+from function.scan import scan_used_content, scan_result_section, scan1_section, scan_logged_section
 from database.database import get_db_session
 from database.models import User, WasteDetectionLog
 from fastapi.responses import RedirectResponse, JSONResponse
@@ -58,42 +58,42 @@ def scan_routes(rt):
         if not user_id:
             return JSONResponse({"status": "error", "message": "User not logged in"}, status_code=401)
 
-        waste_type = request.query_params.get("waste_type", "")
-        point = request.query_params.get("point", "0")
-        timestamp = request.query_params.get("timestamp", "")
         dispose_id = request.query_params.get("id", "")
-
-        print(f"Process Scan - waste_type: {waste_type}, point: {point}, timestamp: {timestamp}, id: {dispose_id}")
+        if not dispose_id:
+            return JSONResponse({"status": "error", "message": "Invalid QR Code data"}, status_code=400)
 
         db = get_db_session()
         try:
+            log = db.query(WasteDetectionLog).filter(WasteDetectionLog.id == dispose_id).first()
+
+            if log and log.username:
+                print(f"QR ID {dispose_id} already claimed by {log.username}.")
+                return JSONResponse({
+                    "status": "error", 
+                    "message": "used",
+                    "claimed_by": log.username
+                })
+
             user = db.query(User).filter(User.id == user_id).first()
             if not user:
                 return JSONResponse({"status": "error", "message": "User not found"}, status_code=404)
 
-            points_to_add = int(point) if point.isdigit() else 0
+            point_str = request.query_params.get("point", "0")
+            points_to_add = int(point_str) if point_str.isdigit() else 0
 
             if points_to_add > 0:
-                if user.point is None:
-                    user.point = 0
-                user.point += points_to_add
-
-                # UPDATE log, not INSERT
-                log = db.query(WasteDetectionLog).filter(WasteDetectionLog.id == dispose_id).first()
+                user.point = (user.point or 0) + points_to_add
                 if log:
                     log.username = user.username
-                    print(f"📝 Updated WasteDetectionLog ID {dispose_id} with username: {user.username}")
-                else:
-                    print(f"⚠️ WasteDetectionLog with ID {dispose_id} not found.")
-
+                    print(f"Updated WasteDetectionLog ID {dispose_id} with username: {user.username}")
                 db.commit()
                 print(f"User {user.username} points updated.")
 
             return JSONResponse({
                 "status": "ok",
-                "waste_type": waste_type,
-                "point": point,
-                "timestamp": timestamp,
+                "waste_type": request.query_params.get("waste_type", ""),
+                "point": point_str,
+                "timestamp": request.query_params.get("timestamp", ""),
                 "id": dispose_id
             })
 
@@ -103,3 +103,8 @@ def scan_routes(rt):
             return JSONResponse({"status": "error", "message": str(e)}, status_code=500)
         finally:
             db.close()
+
+    @rt("/scan_used")
+    def scan_used(request: Request):
+        claimed_by = request.query_params.get("claimed_by", "another user")
+        return scan_used_content(claimed_by)

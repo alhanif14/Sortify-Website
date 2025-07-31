@@ -51,37 +51,45 @@ function detectQRCode(video) {
 
                 console.log("Calling /process_scan with:", params.toString());
 
-                fetch("/process_scan?" + params.toString())
-                    .then(response => {
-                        if (!response.ok) throw new Error("Fetch failed: " + response.status);
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log("Response from /process_scan:", data);
+        fetch("/process_scan?" + params.toString())
+    .then(response => {
+        if (!response.ok) throw new Error("Fetch failed: " + response.status);
+        return response.json();
+    })
+    .then(data => {
+        console.log("Response from /process_scan:", data);
 
-                        if (data.status === "ok") {
-                            const resultParams = new URLSearchParams({
-                                waste_type: data.waste_type,
-                                point: data.point,
-                                timestamp: data.timestamp,
-                                id: data.id
-                            });
+        if (data.status === "ok") {
+            const resultParams = new URLSearchParams({
+                waste_type: data.waste_type,
+                point: data.point,
+                timestamp: data.timestamp,
+                id: data.id
+            });
 
-                            console.log("Navigating to /scan_result with:", resultParams.toString());
-
-                            htmx.ajax("GET", "/scan_result?" + resultParams.toString(), {
-                                target: "#mainContent",
-                                swap: "innerHTML"
-                            });
-                        } else {
-                            console.error("Error from /process_scan:", data.message);
-                            alert("Gagal proses scan: " + data.message);
-                        }
-                    })
-                    .catch(err => {
-                        console.error("Fetch error:", err);
-                        alert("Fetch failed: " + err.message);
-                    });
+            console.log("Navigating to /scan_result with:", resultParams.toString());
+            htmx.ajax("GET", "/scan_result?" + resultParams.toString(), {
+                target: "#mainContent",
+                swap: "innerHTML"
+            });
+        }
+        else if (data.message === 'used') {
+            const claimedBy = data.claimed_by || 'another user';
+            console.log("QR already used, navigating to used page.");
+            htmx.ajax("GET", `/scan_used?claimed_by=${claimedBy}`, {
+                target: "#mainContent",
+                swap: "innerHTML"
+            });
+        }
+        else {
+            console.error("Error from /process_scan:", data.message);
+            alert("Gagal proses scan: " + data.message);
+        }
+    })
+    .catch(err => {
+        console.error("Fetch error:", err);
+        alert("Fetch failed: " + err.message);
+    });
 
                 return;
 
