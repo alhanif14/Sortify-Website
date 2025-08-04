@@ -1,16 +1,16 @@
-function setActiveNav(activePath) {
-    const allNavLinks = document.querySelectorAll('[data-path]');
+// function setActiveNav(activePath) {
+//     const allNavLinks = document.querySelectorAll('[data-path]');
 
-    allNavLinks.forEach(link => {
-        const linkPath = link.getAttribute('data-path');
+//     allNavLinks.forEach(link => {
+//         const linkPath = link.getAttribute('data-path');
 
-        if (linkPath === activePath) {
-            link.classList.add('active');
-        } else {
-            link.classList.remove('active');
-        }
-    });
-}
+//         if (linkPath === activePath) {
+//             link.classList.add('active');
+//         } else {
+//             link.classList.remove('active');
+//         }
+//     });
+// }
 
 
 function initTogglePassword() {
@@ -50,7 +50,7 @@ function initTogglePassword() {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    setActiveNav('/landing');
+    // setActiveNav('/landing');
     initTogglePassword();
     handleScrollTopButton();
 });

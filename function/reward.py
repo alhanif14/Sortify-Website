@@ -131,24 +131,52 @@ def reward_content(user, available_vouchers, coming_soon_vouchers, past_vouchers
     def is_admin(u):
         return u and u.email == "sortify01@gmail.com"
 
+    point_info_data = [
+        {"category": "Recycle (Plastic, Glass, Metal)", "points": 40, "color": "primary"},
+        {"category": "Paper (Newspapers, Cardboard)", "points": 40, "color": "warning"},
+        {"category": "Organic (Food scraps, Leaves)", "points": 30, "color": "success"},
+        {"category": "Other (Residual/Non-recyclable)", "points": 10, "color": "secondary"},
+    ]
+    def point_info_item(item):
+        return Div(
+            Span(item["category"], cls="fw-medium"),
+            Span(f"{item['points']} points", cls=f"badge rounded-pill bg-{item['color']}-subtle text-{item['color']}-emphasis"),
+            cls="d-flex justify-content-between align-items-center list-group-item"
+        )
+
     return Div(
         Div(
-            H2("Sortify Reward Center", cls="text-center fw-bolder"),
-            P("Exchange the points you have collected for various interesting prizes below.", cls="text-center text-muted fs-5"),
-            redeem_alert(success_message, "success") if success_message else "",
-            user_points_display(user),
-            cls="py-5"
-        ),
+            Div(
+                I("redeem", cls="material-symbols-rounded text-success mb-3", style="font-size: 4rem;"),
+                H1("Sortify Reward Center", cls="fw-bolder"),
+                P("Redeem your points for exclusive vouchers, merchandise, or donations!", cls="fs-5 text-muted"),
+                Div(
+                     Span("Your Current Points:", cls="fs-4"),
+                     Span(f"{user.point:,}", cls="badge bg-success fs-5 rounded-pill ms-3"),
+                     cls="d-flex align-items-center mt-4"
+                ),
+                cls="col-lg-7 mb-4 mb-lg-0"
+            ),
+            Div(
+                Div(
+                 H5("How to Earn Points?", cls="fw-bold mb-3"),
+                 Div(*[point_info_item(item) for item in point_info_data], cls="list-group list-group-flush"),
+                 cls="card-body"
+                 ),
+                  cls="card shadow-sm h-100 col-lg-5"),
+            cls="row align-items-center mb-5 p-4"
+    ),
+
+        redeem_alert(success_message, "success") if success_message else "",
+
         Div(
-            H3("Available Rewards", cls="mb-3"),
+            H3("Available Rewards"),
             Button(
                 I("add", cls="material-symbols-rounded"),
-                cls="btn btn-success ms-auto",
-                data_bs_toggle="modal", data_bs_target="#adminRewardModal",
-                hx_get="/admin/voucher/form",
-                hx_target="#adminModalContent"
+                cls="btn btn-success ms-auto", data_bs_toggle="modal", data_bs_target="#adminRewardModal",
+                hx_get="/admin/voucher/form", hx_target="#adminModalContent"
             ) if is_admin(user) else ""
-        , cls="d-flex align-items-center mb-3"),
+        , cls="d-flex align-items-center mt-5 mb-3 border-top pt-4"),
         
         Div(
             *[Div(reward_card(v, user.point, 'available', user), cls="col-lg-3 col-md-4 col-sm-6 mb-4") for v in available_vouchers]
@@ -157,12 +185,12 @@ def reward_content(user, available_vouchers, coming_soon_vouchers, past_vouchers
         ),
         
         *[Div(
-            H3("Coming Soon", cls="mb-3 mt-5"),
+            H3("Coming Soon", cls="mb-3 mt-5 border-top pt-4"),
             Div(*[Div(reward_card(v, user.point, 'coming_soon', user), cls="col-lg-3 col-md-4 col-sm-6 mb-4") for v in coming_soon_vouchers], cls="row mb-5")
         )] if coming_soon_vouchers else "",
         
         *[Div(
-            H3("Redeemed & Expired", cls="mb-3 mt-5"),
+            H3("Redeemed & Expired", cls="mb-3 mt-5 border-top pt-4"),
             Div(*[Div(reward_card(v, user.point, 'past', user), cls="col-lg-3 col-md-4 col-sm-6 mb-4") for v in past_vouchers], cls="row mb-5")
         )] if past_vouchers else "",
 

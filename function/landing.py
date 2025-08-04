@@ -36,7 +36,7 @@ def landing_stats(user_count, waste_count, redeemed_count):
     
     stats_data = [
         {"id": "stat-users", "value": user_display, "label": "Active Users"},
-        {"id": "stat-waste", "value": waste_display, "label": "Sorted Waste Items"},
+        {"id": "stat-waste", "value": waste_display, "label": "Sorted Waste"},
         {"id": "stat-redeemed", "value": redeemed_display, "label": "Rewards Redeemed"}
     ]
     
@@ -49,7 +49,7 @@ def landing_stats(user_count, waste_count, redeemed_count):
 
     return Div(
         Div(
-            Div(*[Div(stat_item(s), cls="col") for s in stats_data], cls="row row-cols-2 row-cols-lg-3 g-3"),
+            Div(*[Div(stat_item(s), cls="col") for s in stats_data], cls="row row-cols-3 row-cols-lg-3 g-3"),
             cls="container px-5"
         ),
         cls="py-5 bg-success bg-opacity-10"
@@ -59,22 +59,33 @@ def landing_features():
     features_data = [
         {
             "title": "Smart & Fast Scanning",
-            "desc": "No more confusion. Just dispose your waste at sortify, and our system will instantly recognize its type and dispose it with proper sorting.",
+            "desc": [
+                P("No more confusion. Just dispose your waste at sortify, and our system will instantly recognize its type and dispose it with proper sorting.", cls="lead text-muted")
+            ]
         },
         {
             "title": "Point & Rewards System",
-            "desc": "Every time you sort your waste correctly, you earn points. Collect as many points as possible and exchange them for vouchers, donations, or exclusive merchandise.",
+            "desc": [
+                P("Every time you sort your waste correctly, you earn points! Collect points and redeem them for vouchers, donations, or exclusive merchandise.", cls="lead text-muted"),
+                P("Here’s how many points you can earn:", cls="lead text-success mb-1"),
+                Ul(
+                    Li("Recycle (Plastic, Glass, Metal): 40 points"),
+                    Li("Paper (Newspapers, Cardboard): 40 points"),
+                    Li("Organic (Food scraps, Leaves): 30 points"),
+                    Li("Other (Residual/Non-recyclable): 10 points"),
+                    cls="text-muted"
+                )
+            ]
         }
     ]
     
     def feature_item(data, reverse=False):
         text_col = Div(
             H2(data["title"], cls="fw-bolder text-success"),
-            P(data["desc"], cls="lead text-muted"),
+            *data["desc"],
             cls="col-md-7"
         )
         
-        order_img = "order-md-2" if reverse else ""
         order_text = "order-md-1" if reverse else ""
         
         return Div(
@@ -119,7 +130,7 @@ def landing_testimonials():
     testi_data = [
         {"quote": "Sortify completely changed the way I see trash. Now I'm excited to earn points!", "name": "Andi Wijaya", "title": "Student"},
         {"quote": "This app is very educational. My child has learned a lot about different types of waste.", "name": "Citra Lestari", "title": "Housewife"},
-        {"quote": "As an environmental activist, I fully support initiatives like this. Awesome!", "name": "Budi Hartono", "title": "Environmental Activist"}
+        {"quote": "As an environmental activist, I fully support initiatives like this. Awesome!", "name": "Budi Hartono", "title": "Environmental Activist"},
     ]
     
     def testi_card(data):
