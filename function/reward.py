@@ -167,6 +167,15 @@ def reward_content(user, available_vouchers, coming_soon_vouchers, past_vouchers
             cls="row align-items-center mb-5 p-4"
     ),
 
+        Div(
+            P("Need help or have question about reward?", cls="mb-1 text-muted"),
+            A(
+                "Contact Us For Details",
+                href="mailto:sortify01@gmail.com?subject=Question about Sortify Reward",
+                cls="fw-bold text-success"
+            ),
+            cls="text-center p-3 my-4 bg-success-subtle rounded-3 border"
+        ),
         redeem_alert(success_message, "success") if success_message else "",
 
         Div(
@@ -180,7 +189,7 @@ def reward_content(user, available_vouchers, coming_soon_vouchers, past_vouchers
         
         Div(
             *[Div(reward_card(v, user.point, 'available', user), cls="col-lg-3 col-md-4 col-sm-6 mb-4") for v in available_vouchers]
-            if available_vouchers else P("No rewards available at the moment.", cls="text-muted"),
+            if available_vouchers else P("No rewards available at the moment.", cls="text-muted ms-5"),
             cls="row mb-5"
         ),
         

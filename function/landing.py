@@ -128,35 +128,74 @@ def landing_process():
 
 def landing_testimonials():
     testi_data = [
-        {"quote": "Sortify completely changed the way I see trash. Now I'm excited to earn points!", "name": "Andi Wijaya", "title": "Student"},
-        {"quote": "This app is very educational. My child has learned a lot about different types of waste.", "name": "Citra Lestari", "title": "Housewife"},
-        {"quote": "As an environmental activist, I fully support initiatives like this. Awesome!", "name": "Budi Hartono", "title": "Environmental Activist"},
+        {
+            "quote": "This system is a new step towards change for a better environment.",
+            "name": "Bilqis Nabila Mukhtar",
+            "title": "Student",
+            "avatar": "/static/landing/Bilqis.jpeg"
+        },
+        {
+            "quote": "Sortify can help grow the habit of dispose waste to the community. The habit can reduce the amount of waste.",
+            "name": "I Gusti Krisna Aditama",
+            "title": "Environmental Activist",
+            "avatar": "/static/landing/kakrisna.jpeg"
+        },
+        {
+            "quote": "Thanks to Sortify, it's much easier for me to dispose my waste in the right place.",
+            "name": "Tia Fitriyani",
+            "title": "Student",
+            "avatar": "/static/landing/Tia.jpeg"
+        },
+        {
+            "quote": "Sortify is an innovation that is highly relevant to current environtment",
+            "name": "Nadia Putri Salsabil",
+            "title": "Student",
+            "avatar": "/static/landing/Nadia.jpeg"
+        }
     ]
     
     def testi_card(data):
-        return Div(
+        return Div( 
             Div(
-                Div(Span("format_quote", cls="material-symbols-rounded fs-1 text-success"), cls="text-center mb-1"),
-                P(f'"{data["quote"]}"', cls="mb-4 fst-italic"),
-                Div(
-                    Img(src="https://placehold.co/50x50/E2E8F0/475569?text=AV", cls="rounded-circle me-3"),
-                    Div(
-                        Div(data["name"], cls="fw-bold"),
-                        Div(data["title"], cls="text-muted")
-                    ),
-                    cls="d-flex align-items-center justify-content-center"
-                ),
-                cls="card-body p-4"
+                Div(Span("format_quote", cls="material-symbols-rounded fs-1 text-success"), cls="text-center mb-3"),
+                P(f'"{data["quote"]}"', cls="mb-0 fst-italic testimonial-text"),
+                cls="card-body"
             ),
-            cls="card shadow-sm"
+            Div(
+                Img(src=data["avatar"], cls="rounded-circle me-3", style="width:50px;height:50px;object-fit:cover;"),
+                Div(
+                    Div(data["name"], cls="fw-bold"),
+                    Div(data["title"], cls="text-muted small")
+                ),
+                cls="card-footer d-flex align-items-center bg-transparent border-top-0 mb-2"
+            ),
+            cls="card shadow-sm h-100 d-flex flex-column justify-content-between"
         )
     
     return Div(
         Div(
             Div(H2("What do they say about Sortify?", cls="text-center fw-bolder mb-5")),
-            Div(*[Div(testi_card(t), cls="col-lg-4 mb-5 mb-lg-0") for t in testi_data], cls="row gx-5"),
+            Div(
+                *[Div(testi_card(t), cls="col-12 col-lg-3 mb-4") for t in testi_data],
+                cls="row gx-4 gy-4" 
+            ),
             cls="container px-5 py-3 my-5"
         ),
+        Style("""
+            .testimonial-text {
+                overflow: hidden;
+                display: -webkit-box;
+                -webkit-line-clamp: 4;
+                -webkit-box-orient: vertical;
+                text-overflow: ellipsis;
+                word-wrap: break-word;
+            }
+            @media (max-width: 576px) {
+                .testimonial-text {
+                    font-size: 0.95rem;
+                }
+            }
+        """),
         cls="bg-success bg-opacity-10"
     )
 
