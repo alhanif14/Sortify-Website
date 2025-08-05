@@ -9,9 +9,27 @@ if (typeof Chart === 'undefined') {
     };
     let binAvailabilityChart = null;
 
+    const STORAGE_KEY = "sortify_bin_data";
+
+    function loadBinDataFromStorage() {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+            try {
+                const parsed = JSON.parse(stored);
+                Object.assign(binData, parsed);
+            } catch (e) {
+                console.error("Failed to parse stored bin data:", e);
+            }
+        }
+    }
+
+    function saveBinDataToStorage() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(binData));
+    }
+
     function initializeBinChart() {
         const ctx = document.getElementById('binAvailabilityChart')?.getContext('2d');
-        if (!ctx) return; 
+        if (!ctx) return;
 
         if (binAvailabilityChart) {
             binAvailabilityChart.destroy();
@@ -40,6 +58,7 @@ if (typeof Chart === 'undefined') {
             }
         });
     }
+
     function updateDashboardUI() {
         if (!document.getElementById('binAvailabilityChart')) return;
 
@@ -100,6 +119,7 @@ if (typeof Chart === 'undefined') {
                 if (binType && !isNaN(value)) {
                     console.log(`MQTT -> ${binType}: ${value}%`);
                     binData[binType] = value;
+                    saveBinDataToStorage();
                     updateDashboardUI();
                 }
             };
@@ -122,9 +142,12 @@ if (typeof Chart === 'undefined') {
             setTimeout(() => waitForPaho(callback), 100);
         }
     }
+
     function init() {
         if (document.getElementById('binAvailabilityChart')) {
+            loadBinDataFromStorage();
             initializeBinChart();
+            updateDashboardUI();
             connectToMQTT();
         }
     }

@@ -67,7 +67,7 @@ def landing_features():
             "title": "Point & Rewards System",
             "desc": [
                 P("Every time you sort your waste correctly, you earn points! Collect points and redeem them for vouchers, donations, or exclusive merchandise.", cls="lead text-muted"),
-                P("Here’s how many points you can earn:", cls="lead text-success mb-1"),
+                P("Here's how many points you can earn:", cls="lead text-success mb-1"),
                 Ul(
                     Li("Recycle (Plastic, Glass, Metal): 40 points"),
                     Li("Paper (Newspapers, Cardboard): 40 points"),
