@@ -189,8 +189,8 @@ def reward_content(user, available_vouchers, coming_soon_vouchers, past_vouchers
         
         Div(
             *[Div(reward_card(v, user.point, 'available', user), cls="col-lg-3 col-md-4 col-sm-6 mb-4") for v in available_vouchers]
-            if available_vouchers else P("No rewards available at the moment.", cls="text-muted ms-5"),
-            cls="row mb-5"
+            if available_vouchers else P("No rewards available at the moment.", cls="text-muted"),
+            cls="row mb-5 ps-3"
         ),
         
         *[Div(
